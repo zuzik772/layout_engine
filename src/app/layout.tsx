@@ -1,41 +1,26 @@
-"use client";
+import { Metadata } from "next";
+import ClientLayout from "./client-layout";
+import StyledComponentsRegistry from "./styled-components";
 
-import styled, { ThemeProvider } from "styled-components";
-import theme from "./assets/styles/base-theme";
-import { AntdConfigProvider } from "./providers/AntdConfigProvider";
-import { GlobalStyle } from "./assets/styles/global-styles";
-import Header from "./components/Header";
-import SideNavigation from "./components/SideNavigation";
+export const metadata: Metadata = {
+  title: "Layout Engine",
+  description: "Personal development project for Shape Games",
+  keywords: ["personal development", "shape games", "nextjs"],
+};
 
-export default function RootLayout({
+export default function ServerLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
+      <head />
       <body>
-        <ThemeProvider theme={theme}>
-          <AntdConfigProvider>
-            <GlobalStyle />
-            <Header />
-            <WrapperCss>
-              <SideNavigation />
-              <MainCss>{children}</MainCss>
-            </WrapperCss>
-          </AntdConfigProvider>
-        </ThemeProvider>
+        <StyledComponentsRegistry>
+          <ClientLayout>{children}</ClientLayout>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );
 }
-
-const WrapperCss = styled.div`
-  display: flex;
-  gap: ${(p) => p.theme.sizes.spacing2};
-`;
-
-const MainCss = styled.main`
-  background: ${(p) => p.theme.colors.white};
-  min-height: calc(100vh - ${(p) => p.theme.sizes.headerHeight});
-`;

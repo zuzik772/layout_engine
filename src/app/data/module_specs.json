@@ -1,0 +1,179 @@
+{
+  "module_specs": [
+    {
+      "module_spec_id": "PlatformHighlightModuleSpec",
+      "name": "Platform Highlight",
+      "id": "PlatformHighlightModuleSpec"
+    },
+    {
+      "module_spec_id": "PlatformMediaModuleSpec",
+      "name": "Platform Media Module",
+      "id": "PlatformMediaModuleSpec"
+    },
+    {
+      "module_spec_id": "GameCollectionModuleSpecV2",
+      "name": "Platform Game Collection",
+      "id": "GameCollectionModuleSpecV2"
+    },
+    {
+      "module_spec_id": "FavoritesGameCollectionModuleSpecV2",
+      "name": "Favorites Game Collection",
+      "id": "FavoritesGameCollectionModuleSpecV2"
+    },
+    {
+      "module_spec_id": "RecentlyPlayedGameCollectionModuleSpecV2",
+      "name": "Recently Played Game Collection",
+      "id": "RecentlyPlayedGameCollectionModuleSpecV2"
+    },
+    {
+      "module_spec_id": "SearchGameCollectionModuleSpecV2",
+      "name": "Search Game Collection",
+      "id": "SearchGameCollectionModuleSpecV2"
+    },
+    {
+      "module_spec_id": "PrepackLeagueEventGroupLists",
+      "name": "Prepack League Event Group Lists",
+      "id": "PrepackLeagueEventGroupLists"
+    },
+    {
+      "module_spec_id": "LeagueEventGroupLists",
+      "name": "League Event Group Lists",
+      "id": "LeagueEventGroupLists"
+    },
+    {
+      "module_spec_id": "InRunningLeagueEventGroupLists",
+      "name": "Live League Event Group Lists",
+      "id": "InRunningLeagueEventGroupLists"
+    },
+    {
+      "module_spec_id": "InRunningEventGroupListSpec",
+      "name": "Live Event Group List",
+      "id": "InRunningEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "NoIconInRunningEventGroupListSpec",
+      "name": "No Icon Live Event Group List",
+      "id": "NoIconInRunningEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "SportsbookSearch",
+      "name": "Sportsbook Search Spec",
+      "id": "SportsbookSearch"
+    },
+    {
+      "module_spec_id": "HighlightedEventGroupListSpec",
+      "name": "Highlighted events Group List",
+      "id": "HighlightedEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "RecommendationEventGroupModuleSpec",
+      "name": "Recommendations event list",
+      "id": "RecommendationEventGroupModuleSpec"
+    },
+    {
+      "module_spec_id": "DailyEventGroupListsSpec",
+      "name": "Daily events Group List",
+      "id": "DailyEventGroupListsSpec"
+    },
+    {
+      "module_spec_id": "OutrightsEventGroupListsSpec",
+      "name": "Outrights events Group List",
+      "id": "OutrightsEventGroupListsSpec"
+    },
+    {
+      "module_spec_id": "OutrightLeagueEventGroupListsSpec",
+      "name": "Outrights league events Group List",
+      "id": "OutrightLeagueEventGroupListsSpec"
+    },
+    {
+      "module_spec_id": "StatsEventGroupListsSpec",
+      "name": "Stats Event Group List",
+      "id": "StatsEventGroupListsSpec"
+    },
+    {
+      "module_spec_id": "StreamedEventListSpec",
+      "name": "Streamed Events",
+      "id": "StreamedEventListSpec"
+    },
+    {
+      "module_spec_id": "VideoStreamedEventsSpec",
+      "name": "Video Streamed Events",
+      "id": "VideoStreamedEventsSpec"
+    },
+    {
+      "module_spec_id": "VideoStreamedLeagueEventGroupListSpec",
+      "name": "Video Streamed League Group Lists",
+      "id": "VideoStreamedLeagueEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "NorskTippingVideoStreamedEventsSpec",
+      "name": "Norsk Tipping Live Streamed Events",
+      "id": "NorskTippingVideoStreamedEventsSpec"
+    },
+    {
+      "module_spec_id": "UpcomingLiveEventGroupListSpec",
+      "name": "Upcoming Live Events Group List",
+      "id": "UpcomingLiveEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "UpcomingStreamedEventGroupListSpec",
+      "name": "Upcoming Streamed Events List",
+      "id": "UpcomingStreamedEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "UpcomingMatchEventGroupListSpec",
+      "name": "Upcoming Matches Event List",
+      "id": "UpcomingMatchEventGroupListSpec"
+    },
+    {
+      "module_spec_id": "HighlightsCarouselModuleSpec",
+      "name": "Highlights Carousel",
+      "id": "HighlightsCarouselModuleSpec"
+    },
+    {
+      "module_spec_id": "NextRaceEventSpec",
+      "name": "Race Event List",
+      "id": "NextRaceEventSpec"
+    },
+    {
+      "module_spec_id": "ActionListModuleSpec",
+      "name": "Action List",
+      "id": "ActionListModuleSpec"
+    },
+    {
+      "module_spec_id": "CouponModuleSpec",
+      "name": "Bet Coupon",
+      "id": "CouponModuleSpec"
+    },
+    {
+      "module_spec_id": "VirtualEventGroupSpec",
+      "name": "Virtual events in batches",
+      "id": "VirtualEventGroupSpec"
+    },
+    {
+      "module_spec_id": "VirtualRacingEventGroupSpec",
+      "name": "Virtual racing events in batches",
+      "id": "VirtualRacingEventGroupSpec"
+    },
+    {
+      "module_spec_id": "LiveTvEventGroupModuleSpec",
+      "name": "Live TV event group",
+      "id": "LiveTvEventGroupModuleSpec"
+    },
+    {
+      "module_spec_id": "LiveTvGreyhoundsEventGroupModuleSpec",
+      "name": "Live Tv Greyhounds Event Group",
+      "id": "LiveTvGreyhoundsEventGroupModuleSpec"
+    },
+    {
+      "module_spec_id": "FooterModuleSpec",
+      "name": "Sportsbook Footer",
+      "id": "FooterModuleSpec"
+    },
+    {
+      "module_spec_id": "GlobalBannerModuleSpec",
+      "name": "Global Banner",
+      "id": "GlobalBannerModuleSpec"
+    }
+  ]
+}

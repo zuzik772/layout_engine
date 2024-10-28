@@ -3,9 +3,12 @@
 import styled, { ThemeProvider } from "styled-components";
 import theme from "./assets/styles/base-theme";
 import { AntdConfigProvider } from "./providers/AntdConfigProvider";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { GlobalStyle } from "./assets/styles/global-styles";
 import Header from "./components/Header";
 import SideNavigation from "./components/SideNavigation";
+import NextTopLoader from "nextjs-toploader";
+import StyledComponentsRegistry from "./styled-components";
 
 export default function ClientLayout({
   children,
@@ -13,16 +16,21 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
-      <AntdConfigProvider>
-        <GlobalStyle />
-        <Header />
-        <WrapperCss>
-          <SideNavigation />
-          <MainCss>{children}</MainCss>
-        </WrapperCss>
-      </AntdConfigProvider>
-    </ThemeProvider>
+    <StyledComponentsRegistry>
+      <ThemeProvider theme={theme}>
+        <AntdRegistry>
+          <AntdConfigProvider>
+            <NextTopLoader height={4} showSpinner={false} />
+            <GlobalStyle />
+            <Header />
+            <WrapperCss>
+              <SideNavigation />
+              <MainCss>{children}</MainCss>
+            </WrapperCss>
+          </AntdConfigProvider>
+        </AntdRegistry>
+      </ThemeProvider>
+    </StyledComponentsRegistry>
   );
 }
 

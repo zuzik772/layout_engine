@@ -1,3 +1,6 @@
+import withFonts from "next-fonts";
+import withPlugins from "next-compose-plugins";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   compiler: {
@@ -8,4 +11,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPlugins([withFonts], nextConfig);

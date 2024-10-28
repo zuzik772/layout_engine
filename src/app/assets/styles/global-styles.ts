@@ -16,12 +16,11 @@ export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    color: ${(p) => p.theme.colors.textColor};
+    color: #141414;
     word-wrap: break-word;
     font-weight: normal;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-family: ${(p) => p.theme.font.primaryFontFamily};
     overflow: hidden;
     height: 100vh;
     width: 100vw;
@@ -33,7 +32,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   a {
-    text-decoration: none;
+    text-decoration: none;    
   }
 
   strong {
@@ -42,12 +41,12 @@ export const GlobalStyle = createGlobalStyle`
 
   input, textarea, select{
     &:focus {
-      border-color: ${(p) => p.theme.colors.borderColorDark} !important;
+      border-color: '#a9a9a9' !important;
       box-shadow: none !important;
     }
 
     &::placeholder {
-      color: ${(p) => p.theme.colors.gray600} !important;
+      color: '#979797' !important;
     }
   }
 

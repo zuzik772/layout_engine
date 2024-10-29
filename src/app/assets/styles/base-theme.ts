@@ -1,5 +1,16 @@
 const defaultColors = {
   white: "#fff",
+  black: "#000",
+
+  gray50: "#fcfcfc",
+  gray100: "#f6f6f6",
+  gray200: "#eeeeee",
+  gray300: "#d9d8d8",
+  gray400: "#cccccc",
+  gray500: "#a9a9a9",
+  gray600: "#979797",
+  gray700: "#4c4c4c",
+  gray900: "#3c3b3b",
 
   primary300: "#5176D6",
   primary500: "#073BC5",

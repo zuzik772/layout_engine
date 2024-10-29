@@ -44,5 +44,5 @@ const MainCss = styled.main`
   height: 100%;
   background: ${(p) => p.theme.colors.white};
   min-height: calc(100vh - ${(p) => p.theme.sizes.headerHeight});
-  padding-bottom: 2rem;
+  padding: 1rem;
 `;

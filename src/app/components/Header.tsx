@@ -5,7 +5,7 @@ const Header = () => {
   return (
     <HeaderCss>
       <Link href="/">Logo</Link>
-      <Link href="/login">Login</Link>
+      <Link href="/auth/sign-in">Sign in</Link>
     </HeaderCss>
   );
 };

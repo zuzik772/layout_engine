@@ -1,10 +1,16 @@
+import Link from "next/link";
 import styled from "styled-components";
 
 const SideNavigation = () => {
   return (
     <WrapperCss>
       <SideNavigationCss>
-        <SideNavigationItemCss>Module CMS</SideNavigationItemCss>
+        <SideNavigationItemCss>
+          <Link href={"/cms"}>Module CMS</Link>
+        </SideNavigationItemCss>
+        <SideNavigationItemCss>
+          <Link href={"/cms/preview"}>Preview</Link>
+        </SideNavigationItemCss>
       </SideNavigationCss>
     </WrapperCss>
   );

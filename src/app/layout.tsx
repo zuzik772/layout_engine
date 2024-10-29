@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   keywords: ["personal development", "shape games", "nextjs"],
 };
 
-export default function ServerLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;

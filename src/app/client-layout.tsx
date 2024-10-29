@@ -24,7 +24,6 @@ export default function ClientLayout({
             <GlobalStyle />
             <Header />
             <WrapperCss>
-              <SideNavigation />
               <MainCss>{children}</MainCss>
             </WrapperCss>
           </AntdConfigProvider>
@@ -36,13 +35,10 @@ export default function ClientLayout({
 
 const WrapperCss = styled.div`
   display: flex;
-  gap: ${(p) => p.theme.sizes.spacing2};
 `;
 
 const MainCss = styled.main`
   width: 100%;
   height: 100%;
   background: ${(p) => p.theme.colors.white};
-  min-height: calc(100vh - ${(p) => p.theme.sizes.headerHeight});
-  padding: 1rem;
 `;

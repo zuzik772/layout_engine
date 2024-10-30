@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { FlexContainer } from "../cms/page";
+import { FlexContainer } from "../components/ModuleGroups/ModuleGroups";
 
 export default function AuthLayout({
   children,
@@ -12,7 +12,12 @@ export default function AuthLayout({
 }
 
 export const FlexCenterContainer = styled(FlexContainer)`
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 80vh;
+  padding: 2rem;
+  max-width: 500px;
+  margin: 0 auto;
 `;

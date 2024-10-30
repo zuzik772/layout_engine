@@ -6,7 +6,6 @@ import { AntdConfigProvider } from "./providers/AntdConfigProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { GlobalStyle } from "./assets/styles/global-styles";
 import Header from "./components/Header";
-import SideNavigation from "./components/SideNavigation";
 import NextTopLoader from "nextjs-toploader";
 import StyledComponentsRegistry from "./styled-components";
 
@@ -33,11 +32,12 @@ export default function ClientLayout({
   );
 }
 
-const WrapperCss = styled.div`
+export const WrapperCss = styled.div`
   display: flex;
+  gap: 1rem;
 `;
 
-const MainCss = styled.main`
+export const MainCss = styled.main`
   width: 100%;
   height: 100%;
   background: ${(p) => p.theme.colors.white};

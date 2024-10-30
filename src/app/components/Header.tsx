@@ -1,11 +1,13 @@
+"use client";
 import Link from "next/link";
 import styled from "styled-components";
-
+import { Logo } from "./Logo";
 const Header = () => {
   return (
     <HeaderCss>
-      <Link href="/">Logo</Link>
-      <Link href="/auth/sign-in">Sign in</Link>
+      <Link href="/">
+        <Logo />
+      </Link>
     </HeaderCss>
   );
 };
@@ -24,5 +26,6 @@ const HeaderCss = styled.header`
 
   a {
     color: inherit;
+    transform: scale(0.9);
   }
 `;

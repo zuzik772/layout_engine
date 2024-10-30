@@ -9,16 +9,21 @@ import {
   FlexColCss,
   HeadingCss,
 } from "../sign-in/page";
+import { signUpAction } from "@/app/actions";
+import { FormMessage, Message } from "@/app/components/FormMessage";
 
-function SignUpPage() {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+function SignUpPage({ searchParams }: { searchParams: Message }) {
+  const onFinish = async (values: any) => {
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    await signUpAction(formData);
   };
-
   return (
     <FlexColCss>
       <HeadingCss>Sign up</HeadingCss>
       <DescriptionCss>Please create an account</DescriptionCss>
+      <FormMessage message={searchParams} />
       <Form
         name="signup"
         initialValues={{ remember: true }}
@@ -45,7 +50,7 @@ function SignUpPage() {
           <ButtonCss block type="primary" htmlType="submit">
             Sign up
           </ButtonCss>
-          or <a href="/auth/sign-in">Login now!</a>
+          or <a href="/sign-in">Login now!</a>
         </Form.Item>
       </Form>
     </FlexColCss>

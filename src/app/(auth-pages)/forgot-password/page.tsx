@@ -2,22 +2,24 @@
 
 import React from "react";
 import { UserOutlined } from "@ant-design/icons";
-import { Descriptions, Form, Input } from "antd";
+import { Form, Input } from "antd";
 import {
   ButtonCss,
   DescriptionCss,
   FlexColCss,
   HeadingCss,
 } from "../sign-in/page";
+import { forgotPasswordAction } from "@/app/actions";
 
 function ForgotPasswordPage() {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+  const onFinish = async (values: any) => {
+    const formData = new FormData();
+    formData.append("email", values.email);
+    await forgotPasswordAction(formData);
   };
-
   return (
     <FlexColCss>
-      <HeadingCss>Forgot password</HeadingCss>
+      <HeadingCss>Reset password</HeadingCss>
       <DescriptionCss>Enter your email to reset the password</DescriptionCss>
       <Form
         name="forgot-password"
@@ -35,7 +37,7 @@ function ForgotPasswordPage() {
           <ButtonCss block type="primary" htmlType="submit">
             Send reset link
           </ButtonCss>
-          or <a href="/auth/sign-in">Sign in now!</a>
+          or <a href="/sign-in">Sign in now!</a>
         </Form.Item>
       </Form>
     </FlexColCss>

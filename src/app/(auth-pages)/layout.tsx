@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { FlexContainer } from "../components/ModuleGroups/ModuleGroups";
+import { FlexContainer } from "../protected/page";
 
 export default function AuthLayout({
   children,

@@ -6,13 +6,9 @@ import { createClient } from "../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { FlexCenterContainer } from "../(auth-pages)/layout";
+import { FlexCenterContainer } from "../components/layout/styling";
 
-export default async function CMSLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function CMSLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const router = useRouter();

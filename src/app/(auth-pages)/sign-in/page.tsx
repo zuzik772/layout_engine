@@ -2,13 +2,19 @@
 
 import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
-import styled from "styled-components";
+import { Form, Input } from "antd";
 import { signInAction } from "@/app/actions";
 import { FormMessage, Message } from "@/app/components/FormMessage";
+import { ButtonCss, DescriptionCss, FlexColCss, HeadingCss } from "@/app/components/form/styling";
+
+type SignInForm = {
+  email: string;
+  password: string;
+};
 
 function SignInPage({ searchParams }: { searchParams: Message }) {
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: SignInForm) => {
+    console.log("Received values of sign in form: ", values);
     const formData = new FormData();
     formData.append("email", values.email);
     formData.append("password", values.password);
@@ -19,27 +25,12 @@ function SignInPage({ searchParams }: { searchParams: Message }) {
       <HeadingCss>Sign in</HeadingCss>
       <DescriptionCss>Please sign in to continue</DescriptionCss>
       <FormMessage message={searchParams} />
-      <Form
-        name="sign-in"
-        initialValues={{ remember: true }}
-        style={{ maxWidth: 360 }}
-        onFinish={onFinish}
-      >
-        <Form.Item
-          name="email"
-          rules={[{ required: true, message: "Please input your Email!" }]}
-        >
+      <Form name="sign-in" initialValues={{ remember: true }} style={{ maxWidth: 360 }} onFinish={onFinish}>
+        <Form.Item name="email" rules={[{ required: true, message: "Please input your Email!" }]}>
           <Input prefix={<UserOutlined />} placeholder="Email" />
         </Form.Item>
-        <Form.Item
-          name="password"
-          rules={[{ required: true, message: "Please input your Password!" }]}
-        >
-          <Input
-            prefix={<LockOutlined />}
-            type="password"
-            placeholder="Password"
-          />
+        <Form.Item name="password" rules={[{ required: true, message: "Please input your Password!" }]}>
+          <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
         </Form.Item>
         <Form.Item>
           <a href="/forgot-password">Forgot password</a>
@@ -57,26 +48,3 @@ function SignInPage({ searchParams }: { searchParams: Message }) {
 }
 
 export default SignInPage;
-
-export const FlexColCss = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${(p) => p.theme.sizes.spacing2};
-`;
-export const HeadingCss = styled.h2`
-  color: ${(p) => p.theme.colors.primary500};
-  text-align: center;
-`;
-
-export const LargeHeadingCss = styled(HeadingCss)`
-  font-size: ${(p) => p.theme.sizes.spacing12};
-`;
-
-export const DescriptionCss = styled.p`
-  color: ${(p) => p.theme.colors.gray500};
-  text-align: center;
-`;
-
-export const ButtonCss = styled(Button)`
-  margin-bottom: ${(p) => p.theme.sizes.spacing2};
-`;

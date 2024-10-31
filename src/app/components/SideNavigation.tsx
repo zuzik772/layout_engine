@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styled from "styled-components";
 import { signOutAction } from "../actions";
-import { ButtonCss } from "../(auth-pages)/sign-in/page";
+import { ButtonCss } from "./form/styling";
 
 const SideNavigation = () => {
   return (

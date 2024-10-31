@@ -3,14 +3,10 @@
 import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Form, Input } from "antd";
-import {
-  ButtonCss,
-  DescriptionCss,
-  FlexColCss,
-  HeadingCss,
-} from "../sign-in/page";
+
 import { signUpAction } from "@/app/actions";
 import { FormMessage, Message } from "@/app/components/FormMessage";
+import { FlexColCss, HeadingCss, DescriptionCss, ButtonCss } from "@/app/components/form/styling";
 
 function SignUpPage({ searchParams }: { searchParams: Message }) {
   const onFinish = async (values: any) => {
@@ -24,27 +20,12 @@ function SignUpPage({ searchParams }: { searchParams: Message }) {
       <HeadingCss>Sign up</HeadingCss>
       <DescriptionCss>Please create an account</DescriptionCss>
       <FormMessage message={searchParams} />
-      <Form
-        name="signup"
-        initialValues={{ remember: true }}
-        style={{ maxWidth: 360 }}
-        onFinish={onFinish}
-      >
-        <Form.Item
-          name="email"
-          rules={[{ required: true, message: "Please input your email!" }]}
-        >
+      <Form name="signup" initialValues={{ remember: true }} style={{ maxWidth: 360 }} onFinish={onFinish}>
+        <Form.Item name="email" rules={[{ required: true, message: "Please input your email!" }]}>
           <Input prefix={<UserOutlined />} placeholder="Email" />
         </Form.Item>
-        <Form.Item
-          name="password"
-          rules={[{ required: true, message: "Please input your Password!" }]}
-        >
-          <Input
-            prefix={<LockOutlined />}
-            type="password"
-            placeholder="Password"
-          />
+        <Form.Item name="password" rules={[{ required: true, message: "Please input your Password!" }]}>
+          <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
         </Form.Item>
         <Form.Item>
           <ButtonCss block type="primary" htmlType="submit">

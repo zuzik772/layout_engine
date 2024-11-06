@@ -1,45 +1,30 @@
 "use client";
 
-import data from "../../../data/module_groups_specs.json";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import SelectableDropdown from "@/app/components/ant/Dropdown";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
 import { Table, TableWrapper } from "@/app/components/table/styling";
-import { ModuleSpec } from "@/app/data/typings";
-import axios from "axios";
+import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
 
 export default function ModuleSpecsPage() {
-  const moduleGroupsSpecs = data.module_group_specs;
+  // const moduleGroupsSpecs = data.module_group_specs;
+  const {
+    moduleGroups,
+    selectedModuleSpecs,
+    allModuleSpecs,
+    setAllModuleSpecs,
+  } = useModuleGroupProvider();
   const pathname = usePathname();
-  const id = pathname.split("/")[3];
+  const id = Number(pathname.split("/")[3]);
 
-  //replace module_specs from .json and get them from route.ts instead of importing them
+  // const [moduleSpecs, setModuleSpecs] = useState<ModuleSpec[]>([]);
+  // const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
+  //   []
+  // );
 
-  async function getModuleSpecs(): Promise<ModuleSpec[]> {
-    const res = await axios.get("/api/module-specs");
-    return res.data;
-  }
-
-  useEffect(() => {
-    getModuleSpecs().then((data) => {
-      setModuleSpecs(data);
-    });
-  }, []);
-  //   sportsbook home
-  const moduleGroupSpec = moduleGroupsSpecs.find((spec) => spec.id === parseInt(id));
-
-  const selectedModuleSpecIds = moduleGroupSpec?.module_group_spec_module_spec_ids.map((moduleSpec) => moduleSpec.module_spec_id);
-
-  //find selected module specs names from all module specs
-  const [moduleSpecs, setModuleSpecs] = useState<ModuleSpec[]>([]);
-  console.log("moduleSpecs", moduleSpecs);
-  console.log("selectedModuleSpecIds", selectedModuleSpecIds);
-  const selectedModuleSpecNames = moduleSpecs.filter((moduleSpec) => selectedModuleSpecIds?.includes(moduleSpec.module_spec_id));
-  console.log("selectedModuleSpecNames", selectedModuleSpecNames);
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState(selectedModuleSpecNames);
-  console.log("selectedModuleSpecs", selectedModuleSpecs);
+  //   sportsbook home etc.
+  const moduleGroupSpec = moduleGroups.find((spec) => spec.id === id);
 
   return (
     <div>
@@ -47,13 +32,18 @@ export default function ModuleSpecsPage() {
         <Link href="../">Go back</Link>
         <h2>{moduleGroupSpec?.name}</h2>
         <Wrapper>
-          <SelectableDropdown moduleSpecs={moduleSpecs} setModuleSpecs={setModuleSpecs} />
+          <SelectableDropdown
+            moduleSpecs={allModuleSpecs}
+            setModuleSpecs={setAllModuleSpecs}
+          />
         </Wrapper>
-        <button onClick={() => setSelectedModuleSpecs(selectedModuleSpecNames)}>Import Specs</button>
-        <button onClick={() => setSelectedModuleSpecs([])}>Delete</button>
+        {/* <button onClick={() => setSelectedModuleSpecs(selectedModuleSpecNames)}>
+          Import Specs
+        </button>
+        <button onClick={() => setSelectedModuleSpecs([])}>Delete</button> */}
       </FlexContainer>
 
-      {moduleGroupSpec ? (
+      {selectedModuleSpecs ? (
         <TableWrapper>
           <Table>
             <thead>
@@ -62,7 +52,7 @@ export default function ModuleSpecsPage() {
               </tr>
             </thead>
             <tbody>
-              {selectedModuleSpecNames.map((spec) => (
+              {selectedModuleSpecs.map((spec) => (
                 <tr key={spec.id}>
                   <td>{spec.name}</td>
                 </tr>

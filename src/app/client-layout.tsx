@@ -8,6 +8,7 @@ import { GlobalStyle } from "./assets/styles/global-styles";
 import Header from "./components/Header";
 import NextTopLoader from "nextjs-toploader";
 import StyledComponentsRegistry from "./styled-components";
+import AuthProvider from "./providers/AuthProvider";
 
 export default function ClientLayout({
   children,
@@ -21,10 +22,12 @@ export default function ClientLayout({
           <AntdConfigProvider>
             <NextTopLoader height={4} showSpinner={false} />
             <GlobalStyle />
-            <Header />
-            <WrapperCss>
-              <MainCss>{children}</MainCss>
-            </WrapperCss>
+            <AuthProvider>
+              <Header />
+              <WrapperCss>
+                <MainCss>{children}</MainCss>
+              </WrapperCss>
+            </AuthProvider>
           </AntdConfigProvider>
         </AntdRegistry>
       </ThemeProvider>

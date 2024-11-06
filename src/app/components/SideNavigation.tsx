@@ -27,7 +27,7 @@ const SideNavigation = () => {
 
 export default SideNavigation;
 
-const WrapperCss = styled.nav`
+export const WrapperCss = styled.nav`
   position: relative;
   box-sizing: border-box;
   contain: strict;

@@ -5,108 +5,87 @@ import {
   PropsWithChildren,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { ModuleGroup as ModuleGroupSpec, ModuleSpec } from "../data/typings";
 import axios from "axios";
+import Loading from "../loading";
+import { FlexCenterContainer } from "../components/layout/styling";
 
-type ModuleGroupProps = {
-  moduleGroups: ModuleGroupSpec[];
-  setModuleGroups: (moduleGroups: ModuleGroupSpec[]) => void;
-  selectedModuleSpecs: ModuleSpec[];
-  setSelectedModuleSpecs: (moduleGroups: ModuleSpec[]) => void;
+type ModuleGroupContext = {
+  memoizedModuleGroups: ModuleGroupSpec[];
   allModuleSpecs: ModuleSpec[];
-  setAllModuleSpecs: (moduleGroups: ModuleSpec[]) => void;
+  setModuleSpecs: (moduleGroups: ModuleSpec[]) => void;
 };
 
-const GlobalContext = createContext<ModuleGroupProps>({} as ModuleGroupProps);
+const ModuleGroupContext = createContext<ModuleGroupContext | undefined>(
+  undefined
+);
 
 const ModuleGroupProvider = ({ children }: PropsWithChildren) => {
+  const [loading, setLoading] = useState(true);
   const [moduleGroups, setModuleGroups] = useState<ModuleGroupSpec[]>([]);
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
-    []
-  );
-  const [allModuleSpecs, setAllModuleSpecs] = useState<ModuleSpec[]>([]);
-
-  async function getModuleGroups(): Promise<ModuleGroupSpec[]> {
-    const res = await axios.get("/api/module-group-specs");
-    return res.data;
-  }
-
-  //replace module_specs from .json and get them from route.ts instead of importing them
-
-  async function getModuleSpecs(): Promise<ModuleSpec[]> {
-    const res = await axios.get("/api/module-specs");
-    return res.data;
-  }
-
-  async function getModuleGroupSpecs(id: number): Promise<ModuleSpec[]> {
-    try {
-      console.log("id", id);
-      const res = await axios.get(`/api/module-group-specs/${id}`);
-      console.log("res", res);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching module group specs:", error);
-      throw error;
-    }
-  }
-
-  // async getAllModuleGroupSpecs(): Promise<ModuleSpec[]> {
-  //     try {
-  //       const res = await axios.get(`/api/module-group-specs`);
-  //       return res.data;
-  //     } catch (error) {
-  //       console.error("Error fetching module group specs:", error);
-  //       throw error;
-  //     }
-  //   }
-
-  async function getAllModuleGroupSpecs(): Promise<any[]> {
-    try {
-      const res = await axios.get(`/api/module-group-spec-module-specs`);
-      console.log("hereeeeeeeee res", res);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching module group specs:", error);
-      throw error;
-    }
-  }
+  const [moduleSpecs, setModuleSpecs] = useState<ModuleSpec[]>([]);
 
   useEffect(() => {
-    getModuleSpecs().then((data) => {
-      setAllModuleSpecs(data);
-    });
-    getAllModuleGroupSpecs().then((data) => {
-      console.log("myyyyy data", data);
-    });
-    // getModuleGroupSpecs(id).then((data) => {
-    //   setSelectedModuleSpecs(data);
-    // });
+    async function getModuleGroups() {
+      try {
+        const res = await axios.get("/api/module-group-specs");
+        setModuleGroups(res.data);
+      } catch (error) {
+        console.error("Error fetching module groups:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function getModuleSpecs() {
+      try {
+        const res = await axios.get("/api/module-specs");
+        setModuleSpecs(res.data);
+      } catch (error) {
+        console.error("Error fetching module specs:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getModuleGroups();
+    getModuleSpecs();
   }, []);
 
-  useEffect(() => {
-    getModuleGroups().then((data) => {
-      setModuleGroups(data);
-    });
-  }, []);
+  const memoizedModuleGroups = useMemo(() => moduleGroups, [moduleGroups]);
+  const allModuleSpecs = useMemo(() => moduleSpecs, [moduleSpecs]);
+
+  if (loading) {
+    return (
+      <FlexCenterContainer>
+        <Loading />
+      </FlexCenterContainer>
+    );
+  }
 
   return (
-    <GlobalContext.Provider
+    <ModuleGroupContext.Provider
       value={{
-        moduleGroups,
-        setModuleGroups,
-        selectedModuleSpecs,
-        setSelectedModuleSpecs,
+        memoizedModuleGroups,
         allModuleSpecs,
-        setAllModuleSpecs,
+        setModuleSpecs,
       }}
     >
       {children}
-    </GlobalContext.Provider>
+    </ModuleGroupContext.Provider>
   );
 };
 
-export const useModuleGroupProvider = () => useContext(GlobalContext);
+// export const useModuleGroupProvider = () => useContext(ModuleGroupContext);
+
+export const useModuleGroupProvider = () => {
+  const context = useContext(ModuleGroupContext);
+  if (context === undefined) {
+    throw new Error("useModuleGroup must be used within a ModuleGroupProvider");
+  }
+  return context;
+};
 
 export default ModuleGroupProvider;

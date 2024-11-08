@@ -6,7 +6,8 @@ import { Table, TableWrapper } from "../components/table/styling";
 import { useModuleGroupProvider } from "../providers/ModuleGroupProvider";
 
 export default function HomePage() {
-  const { moduleGroups } = useModuleGroupProvider();
+  const { memoizedModuleGroups } = useModuleGroupProvider();
+  const moduleGroups = memoizedModuleGroups;
   return (
     <Wrapper>
       <FlexContainer>

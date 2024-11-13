@@ -4,10 +4,18 @@ import styled from "styled-components";
 import Link from "next/link";
 import { Table, TableWrapper } from "../components/table/styling";
 import { useModuleGroupProvider } from "../providers/ModuleGroupProvider";
+import { useModuleGroupSpecs } from "../hooks/use-module-groups";
+import { ModuleGroup } from "../data/typings";
 
-export default function HomePage() {
-  const { memoizedModuleGroups } = useModuleGroupProvider();
-  const moduleGroups = memoizedModuleGroups;
+export default async function HomePage() {
+  // const { memoizedModuleGroups } = useModuleGroupProvider();
+  // const moduleGroups = memoizedModuleGroups;
+
+  const moduleGroups = await useModuleGroupSpecs();
+  console.log(moduleGroups);
+  if (!moduleGroups || !Array.isArray(moduleGroups)) {
+    return <div>Loading...</div>;
+  }
   return (
     <Wrapper>
       <FlexContainer>
@@ -18,7 +26,7 @@ export default function HomePage() {
       <TableWrapper>
         <Table>
           <tbody>
-            {moduleGroups.map((moduleGroupSpec) => (
+            {moduleGroups.map((moduleGroupSpec: ModuleGroup) => (
               <tr key={moduleGroupSpec.id}>
                 <td>
                   <LinkCss href={`/protected/modules/${moduleGroupSpec.id}`}>

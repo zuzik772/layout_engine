@@ -12,6 +12,7 @@ import { ModuleGroup as ModuleGroupSpec, ModuleSpec } from "../data/typings";
 import axios from "axios";
 import Loading from "../loading";
 import { FlexCenterContainer } from "../components/layout/styling";
+import { getModuleGroups } from "../api/module-group-specs/api";
 
 type ModuleGroupContext = {
   memoizedModuleGroups: ModuleGroupSpec[];
@@ -28,29 +29,30 @@ const ModuleGroupProvider = ({ children }: PropsWithChildren) => {
   const [moduleGroups, setModuleGroups] = useState<ModuleGroupSpec[]>([]);
   const [moduleSpecs, setModuleSpecs] = useState<ModuleSpec[]>([]);
 
-  useEffect(() => {
-    async function getModuleGroups() {
-      try {
-        const res = await axios.get("/api/module-group-specs");
-        setModuleGroups(res.data);
-      } catch (error) {
-        console.error("Error fetching module groups:", error);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchModuleGroups() {
+    try {
+      const data = await getModuleGroups();
+      setModuleGroups(data);
+    } catch (error) {
+      console.error("Error fetching module groups:", error);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    async function getModuleSpecs() {
-      try {
-        const res = await axios.get("/api/module-specs");
-        setModuleSpecs(res.data);
-      } catch (error) {
-        console.error("Error fetching module specs:", error);
-      } finally {
-        setLoading(false);
-      }
+  async function getModuleSpecs() {
+    try {
+      const res = await axios.get("/api/module-specs");
+      setModuleSpecs(res.data);
+    } catch (error) {
+      console.error("Error fetching module specs:", error);
+    } finally {
+      setLoading(false);
     }
-    getModuleGroups();
+  }
+
+  useEffect(() => {
+    fetchModuleGroups();
     getModuleSpecs();
   }, []);
 

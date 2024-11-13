@@ -8,31 +8,21 @@ import { Table, TableWrapper } from "@/app/components/table/styling";
 import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
 import { ModuleSpec } from "@/app/data/typings";
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { get } from "http";
+import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
+import AntDrawer from "@/app/components/drawer/Drawer";
+import { useDrawerContext } from "@/app/providers/DrawerProvider";
 
 export default function ModuleSpecsPage() {
-  // const moduleGroupsSpecs = data.module_group_specs;
-  const { memoizedModuleGroups, allModuleSpecs, setModuleSpecs } =
-    useModuleGroupProvider();
+  const { openDrawer } = useDrawerContext();
+  const { memoizedModuleGroups } = useModuleGroupProvider();
+  const moduleGroups = memoizedModuleGroups;
+  const { allModuleSpecs, setModuleSpecs } = useModuleGroupProvider();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
-  const moduleGroups = memoizedModuleGroups;
 
   const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
     []
   );
-
-  async function getModuleGroupSpecs(id: number): Promise<ModuleSpec[]> {
-    try {
-      console.log("id", id);
-      const res = await axios.get(`/api/module-group-spec-module-specs/${id}`);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching module group specs:", error);
-      throw error;
-    }
-  }
 
   useEffect(() => {
     getModuleGroupSpecs(id).then((data) => {
@@ -79,12 +69,13 @@ export default function ModuleSpecsPage() {
             </thead>
             <tbody>
               {selectedModuleSpecs.map((spec) => (
-                <tr key={spec.id}>
+                <tr key={spec.id} onClick={() => openDrawer(spec.name)}>
                   <td>{spec.name}</td>
                 </tr>
               ))}
             </tbody>
           </Table>
+          <AntDrawer />
         </TableWrapper>
       ) : (
         <p>Module Group Spec not found</p>

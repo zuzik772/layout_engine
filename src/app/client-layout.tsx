@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import NextTopLoader from "nextjs-toploader";
 import StyledComponentsRegistry from "./styled-components";
 import AuthProvider from "./providers/AuthProvider";
+import DrawerProvider from "./providers/DrawerProvider";
 import { QueryClientProvider } from "./providers/QueryClientProvider";
 
 export default function ClientLayout({
@@ -25,10 +26,12 @@ export default function ClientLayout({
               <NextTopLoader height={4} showSpinner={false} />
               <GlobalStyle />
               <AuthProvider>
-                <Header />
-                <WrapperCss>
-                  <MainCss>{children}</MainCss>
-                </WrapperCss>
+                <DrawerProvider>
+                  <Header />
+                  <WrapperCss>
+                    <MainCss>{children}</MainCss>
+                  </WrapperCss>
+                </DrawerProvider>
               </AuthProvider>
             </QueryClientProvider>
           </AntdConfigProvider>

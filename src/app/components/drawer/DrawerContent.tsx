@@ -74,8 +74,7 @@ const DrawerContent = () => {
         )}
 
         {/* Equivalent to fillColumns attribute */}
-        <LayoutType />
-        <CustomLayoutSelect />
+        <LayoutType isMobileContainer={isMobileContainer} />
       </WrapperCss>
     </Form>
   );

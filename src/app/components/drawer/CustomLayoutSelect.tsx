@@ -1,22 +1,39 @@
 import { Select, Col, Row } from "antd";
 import { StyledFormItem } from "./DrawerContent";
 import { useLayoutTypeContext } from "./layout/LayoutProvider";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
-const CustomLayoutSelect = () => {
+interface CustomLayoutSelectProps {
+  selectedMobileRows: number;
+  setSelectedMobileRows: (value: number) => void;
+  selectedWebRows: number;
+  setSelectedWebRows: (value: number) => void;
+  selectedMobileColumns: number;
+  setSelectedMobileColumns: (value: number) => void;
+  selectedWebColumns: number;
+  setSelectedWebColumns: (value: number) => void;
+  currentColumns: number;
+  setCurrentColumns: (value: number) => void;
+  currentRows: number;
+  setCurrentRows: (value: number) => void;
+}
+
+const CustomLayoutSelect = (props: CustomLayoutSelectProps) => {
+  const {
+    selectedMobileRows,
+    setSelectedMobileRows,
+    selectedWebRows,
+    setSelectedWebRows,
+    selectedMobileColumns,
+    setSelectedMobileColumns,
+    selectedWebColumns,
+    setSelectedWebColumns,
+    currentColumns,
+    setCurrentColumns,
+    currentRows,
+    setCurrentRows,
+  } = props;
   const { isMobileLayout } = useLayoutTypeContext();
-
-  // State for mobile and web columns
-  const [selectedMobileColumns, setSelectedMobileColumns] = useState<number>(1);
-  const [selectedWebColumns, setSelectedWebColumns] = useState<number>(1);
-
-  // State for mobile and web rows
-  const [selectedMobileRows, setSelectedMobileRows] = useState<number>(1);
-  const [selectedWebRows, setSelectedWebRows] = useState<number>(1);
-
-  // State to hold the currently displayed columns and rows based on layout
-  const [currentColumns, setCurrentColumns] = useState<number>(isMobileLayout ? selectedMobileColumns : selectedWebColumns);
-  const [currentRows, setCurrentRows] = useState<number>(isMobileLayout ? selectedMobileRows : selectedWebRows);
 
   const { Option } = Select;
 
@@ -24,7 +41,7 @@ const CustomLayoutSelect = () => {
   useEffect(() => {
     setCurrentColumns(isMobileLayout ? selectedMobileColumns : selectedWebColumns);
     setCurrentRows(isMobileLayout ? selectedMobileRows : selectedWebRows);
-  }, [isMobileLayout, selectedMobileColumns, selectedWebColumns, selectedMobileRows, selectedWebRows]);
+  }, [isMobileLayout, selectedMobileColumns, selectedWebColumns, selectedMobileRows, selectedWebRows, setCurrentColumns, setCurrentRows]);
 
   // Handlers to update columns and rows based on the current layout
   const handleColumnsChange = (value: number) => {

@@ -1,13 +1,30 @@
 import { Row, Col, Radio, CheckboxProps } from "antd";
 import React, { useState } from "react";
 import { StyledFormItem } from "../DrawerContent";
-import styled from "styled-components";
 import { useLayoutTypeContext } from "./LayoutProvider";
+import LayoutPreview from "./LayoutPreview";
+import CustomLayoutSelect from "../CustomLayoutSelect";
 
-const LayoutType = () => {
+type LayoutTypeProps = {
+  isMobileContainer: boolean;
+};
+
+const LayoutType = ({ isMobileContainer }: LayoutTypeProps) => {
   const { isMobileLayout } = useLayoutTypeContext();
   const [selectedMobileLayout, setSelectedMobileLayout] = useState("3/3");
   const [selectedWebLayout, setSelectedWebLayout] = useState("3/3");
+
+  // State for mobile and web columns
+  const [selectedMobileColumns, setSelectedMobileColumns] = useState<number>(1);
+  const [selectedWebColumns, setSelectedWebColumns] = useState<number>(1);
+
+  // State for mobile and web rows
+  const [selectedMobileRows, setSelectedMobileRows] = useState<number>(1);
+  const [selectedWebRows, setSelectedWebRows] = useState<number>(1);
+
+  // State to hold the currently displayed columns and rows based on layout
+  const [currentColumns, setCurrentColumns] = useState<number>(isMobileLayout ? selectedMobileColumns : selectedWebColumns);
+  const [currentRows, setCurrentRows] = useState<number>(isMobileLayout ? selectedMobileRows : selectedWebRows);
 
   const layoutOptions = [
     { label: "1/3", value: "1/3" },
@@ -20,19 +37,6 @@ const LayoutType = () => {
       setSelectedMobileLayout(e.target.value);
     } else {
       setSelectedWebLayout(e.target.value);
-    }
-  };
-
-  const getColumnIndices = () => {
-    switch (getSelectedLayout()) {
-      case "1/3":
-        return [1, 2, 3];
-      case "2/3":
-        return [1, 2, 3];
-      case "3/3":
-        return [3];
-      default:
-        return [];
     }
   };
 
@@ -56,57 +60,28 @@ const LayoutType = () => {
           </StyledFormItem>
         </Col>
       </Row>
-      <Row>
-        <Col span={24}>
-          <StyledFormItem label={"Layout Preview"}>
-            <WrapperCss>
-              {getColumnIndices().map((index) => (
-                <LayoutPreviewCss key={index} selectedLayout={getSelectedLayout()} index={index}>
-                  {index === 3 ? <p>Full screen layout</p> : <p>{index}/3 layout</p>}
-                </LayoutPreviewCss>
-              ))}
-            </WrapperCss>
-          </StyledFormItem>
-        </Col>
-      </Row>
+      <CustomLayoutSelect
+        selectedMobileRows={selectedMobileRows}
+        setSelectedMobileRows={setSelectedMobileRows}
+        selectedWebRows={selectedWebRows}
+        setSelectedWebRows={setSelectedWebRows}
+        selectedMobileColumns={selectedMobileColumns}
+        setSelectedMobileColumns={setSelectedMobileColumns}
+        selectedWebColumns={selectedWebColumns}
+        setSelectedWebColumns={setSelectedWebColumns}
+        currentColumns={currentColumns}
+        setCurrentColumns={setCurrentColumns}
+        currentRows={currentRows}
+        setCurrentRows={setCurrentRows}
+      />
+      <LayoutPreview
+        selectedLayout={getSelectedLayout()}
+        numberOfColumns={currentColumns}
+        numberOfRows={currentRows}
+        isMobileContainer={isMobileContainer}
+      />
     </>
   );
 };
 
 export default LayoutType;
-
-const WrapperCss = styled.div`
-  display: flex;
-  div:first-child {
-    border-radius: 8px 0 0 8px;
-  }
-
-  div:last-child {
-    border-radius: 0 8px 8px 0;
-  }
-
-  div:only-child {
-    border-radius: 8px;
-  }
-`;
-
-const LayoutPreviewCss = styled.div<{ selectedLayout: string; index: number }>`
-  height: 100px;
-  width: 100%;
-  display: grid;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #b4b4b4;
-  padding: 12px;
-  ${({ index, selectedLayout }) => {
-    const bgColor = "background-color: #e0e0e0";
-    switch (selectedLayout) {
-      case "1/3":
-        return index === 1 ? bgColor : "color: transparent";
-      case "2/3":
-        return index <= 2 ? bgColor : "color: transparent";
-      case "3/3":
-        return bgColor;
-    }
-  }};
-`;

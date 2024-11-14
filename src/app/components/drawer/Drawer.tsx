@@ -3,6 +3,7 @@
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { Drawer, Button, Space } from "antd";
 import DrawerContent from "./DrawerContent";
+import LayoutTypeProvider from "./layout/LayoutProvider";
 
 function AntDrawer() {
   const { drawerOpen, closeDrawer, selectedItemId } = useDrawerContext();
@@ -18,7 +19,6 @@ function AntDrawer() {
         open={drawerOpen}
         footer={
           <Space>
-            <Button onClick={closeDrawer}>Revert changes</Button>
             <Button onClick={closeDrawer}>Cancel</Button>
             <Button type="primary" onClick={closeDrawer}>
               Publish
@@ -26,7 +26,9 @@ function AntDrawer() {
           </Space>
         }
       >
-        <DrawerContent />
+        <LayoutTypeProvider>
+          <DrawerContent />
+        </LayoutTypeProvider>
       </Drawer>
     </>
   );

@@ -44,7 +44,7 @@ const LayoutType = () => {
     <>
       <Row gutter={16}>
         <Col span={24}>
-          <StyledFormItem label="Choose layout">
+          <StyledFormItem label={`${isMobileLayout ? "Mobile" : "Web"} Layout`}>
             <Radio.Group
               block
               options={layoutOptions}

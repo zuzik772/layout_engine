@@ -5,6 +5,7 @@ import styled from "styled-components";
 import ContainerMode from "./ContainerMode";
 import LayoutType from "./layout/LayoutType";
 import { useLayoutTypeContext } from "./layout/LayoutProvider";
+import CustomLayoutSelect from "./CustomLayoutSelect";
 
 const DrawerContent = () => {
   const { isMobileLayout, setIsMobileLayout } = useLayoutTypeContext();
@@ -42,82 +43,40 @@ const DrawerContent = () => {
         </Col>
       </Row>
 
-      <SectionTitle>Customized layout settings</SectionTitle>
-      <Row gutter={16}>
-        <Col span={24}>
-          <StyledFormItem>
-            {/* Equivalent to 1/3 (mobile),2 column (tablet - DEPRECATED), 3 column (web) attribute */}
-            <Radio.Group block options={options} defaultValue="Mobile" optionType="button" buttonStyle="solid" onChange={handleContainerModeChange} />
-          </StyledFormItem>
-        </Col>
-      </Row>
+      <WrapperCss>
+        <SectionTitle>Layout Settings</SectionTitle>
+        <Row gutter={16}>
+          <Col span={24}>
+            <StyledFormItem>
+              {/* Equivalent to 1/3 (mobile),2 column (tablet - DEPRECATED), 3 column (web) attribute */}
+              <Radio.Group
+                block
+                options={options}
+                defaultValue="Mobile"
+                optionType="button"
+                buttonStyle="solid"
+                onChange={handleContainerModeChange}
+              />
+            </StyledFormItem>
+          </Col>
+        </Row>
 
-      {isMobileLayout ? (
-        <>
-          {/* Equivalent to Boxed attribute */}
-          <ContainerMode isChecked={isMobileContainer} onChange={(e) => setIsMobileContainer(e.target.checked)} />
-        </>
-      ) : (
-        <>
-          {/* Equivalent to Boxed attribute */}
-          <ContainerMode isChecked={isWebContainer} onChange={(e) => setIsWebContainer(e.target.checked)} />
-        </>
-      )}
+        {isMobileLayout ? (
+          <>
+            {/* Equivalent to Boxed attribute */}
+            <ContainerMode isChecked={isMobileContainer} onChange={(e) => setIsMobileContainer(e.target.checked)} />
+          </>
+        ) : (
+          <>
+            {/* Equivalent to Boxed attribute */}
+            <ContainerMode isChecked={isWebContainer} onChange={(e) => setIsWebContainer(e.target.checked)} />
+          </>
+        )}
 
-      {/* Equivalent to fillColumns attribute */}
-      <LayoutType />
-
-      {/* Equivalent to Columns options (1-8) */}
-      <Row gutter={16}>
-        <Col span={8}>
-          <StyledFormItem
-            name="columns"
-            label="Columns"
-            rules={[
-              {
-                required: true,
-                message: "Please choose the number of columns",
-              },
-            ]}
-          >
-            <Select placeholder="Please choose the number of columns">
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
-              <Option value="3">3</Option>
-              <Option value="4">4</Option>
-              <Option value="5">5</Option>
-              <Option value="6">6</Option>
-              <Option value="7">7</Option>
-              <Option value="8">8</Option>
-            </Select>
-          </StyledFormItem>
-        </Col>
-        <Col span={8}>
-          <StyledFormItem
-            name="rows"
-            label="Rows"
-            rules={[
-              {
-                required: true,
-                message: "Please choose the number of Rows",
-              },
-            ]}
-          >
-            <Select placeholder="Please choose the number of rows">
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
-              <Option value="3">3</Option>
-              <Option value="4">4</Option>
-              <Option value="5">5</Option>
-              <Option value="6">6</Option>
-              <Option value="7">7</Option>
-              <Option value="8">8</Option>
-            </Select>
-          </StyledFormItem>
-        </Col>
-      </Row>
-
-      {/* Equivalent to Rows options (1-8) */}
+        {/* Equivalent to fillColumns attribute */}
+        <LayoutType />
+        <CustomLayoutSelect />
+      </WrapperCss>
     </Form>
   );
 };
@@ -132,6 +91,14 @@ const SectionTitle = styled.h3`
 
 export const StyledFormItem = styled(Form.Item)`
   .ant-form-item-label > label {
-    font-weight: 500;
+    font-weight: 600;
   }
+`;
+
+const WrapperCss = styled.div`
+  margin-top: 16px;
+  padding: 8px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;

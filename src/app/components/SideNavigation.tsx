@@ -51,6 +51,7 @@ export const WrapperCss = styled.nav`
   }
 
   width: ${(p) => p.theme.sizes.sidebarWidth};
+  min-width: ${(p) => p.theme.sizes.sidebarWidth};
   background-color: ${(p) => p.theme.colors.sidebarBackground};
 `;
 

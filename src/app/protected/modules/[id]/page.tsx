@@ -4,14 +4,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import SelectableDropdown from "@/app/components/ant/Dropdown";
 import styled from "styled-components";
-import { Table as TableCss, TableWrapper } from "@/app/components/table/styling";
 import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
 import { ModuleSpec } from "@/app/data/typings";
 import { useEffect, useMemo, useState } from "react";
 import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
 import AntDrawer from "@/app/components/drawer/Drawer";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
-import { CustomTable as Table } from "@/app/components/table/Table";
+import { ModuleSpecsTable } from "@/app/components/table/ModuleSpecsTable";
+import { FlexContainer } from "@/app/components/ModuleGroupsHeader";
 
 export default function ModuleSpecsPage() {
   const { openDrawer } = useDrawerContext();
@@ -39,7 +39,7 @@ export default function ModuleSpecsPage() {
   const moduleGroupSpec = moduleGroups.find((spec) => spec.id === id);
 
   return (
-    <div>
+    <FlexContainer>
       <FlexContainer>
         <Link href="../">Go back</Link>
         <h2>{moduleGroupSpec?.name}</h2>
@@ -50,22 +50,21 @@ export default function ModuleSpecsPage() {
         <button onClick={() => setSelectedModuleSpecs([])}>Delete</button>
       </FlexContainer>
       <TableWrapper>
-        <Table />
+        <ModuleSpecsTable />
         <AntDrawer />
       </TableWrapper>
-    </div>
+    </FlexContainer>
   );
 }
 
 const Wrapper = styled.div`
-  position: relative;
-  max-height: 90vh;
+  overflow: auto;
 `;
 
-const FlexContainer = styled.div`
+const TableWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem;
-  padding-left: 0;
+  flex-direction: column;
+  width: 100%;
+  height: calc(-140px + 100vh);
+  overflow-y: auto;
 `;

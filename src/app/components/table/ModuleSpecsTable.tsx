@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table } from "antd";
+import { Skeleton, Table } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
 import { ModuleSpec } from "@/app/data/typings";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
-import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
 import { usePathname } from "next/navigation";
 
 interface DataType {
@@ -25,13 +24,9 @@ const rowSelection: TableProps<DataType>["rowSelection"] = {
   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
     console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
   },
-  getCheckboxProps: (record: DataType) => ({
-    disabled: record.name === "Disabled User", // Column configuration not to be checked
-    name: record.name,
-  }),
 };
 
-export const CustomTable = () => {
+export const ModuleSpecsTable = () => {
   const { openDrawer } = useDrawerContext();
 
   const pathname = usePathname();
@@ -45,17 +40,18 @@ export const CustomTable = () => {
     });
   }, []);
 
-  const memoizedSelectedGroupSpecs = useMemo(() => selectedModuleSpecs, [selectedModuleSpecs]);
-
-  const data: DataType[] = memoizedSelectedGroupSpecs.map((spec) => ({ key: spec.id, name: spec.name }));
-
-  const [selectionType, setSelectionType] = useState<"checkbox" | "radio">("checkbox");
+  if (!selectedModuleSpecs) {
+    return <Skeleton active />;
+  }
+  const data: DataType[] = selectedModuleSpecs.map((spec) => ({ key: spec.id, name: spec.name }));
 
   return (
     <Table<DataType>
-      rowSelection={{ type: selectionType, ...rowSelection }}
+      rowSelection={{ ...rowSelection }}
       columns={columns}
       dataSource={data}
+      pagination={false}
+      sticky
       onRow={(spec) => ({
         onClick: () => openDrawer(spec.name),
       })}

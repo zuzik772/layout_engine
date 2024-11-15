@@ -12,11 +12,7 @@ import AuthProvider from "./providers/AuthProvider";
 import DrawerProvider from "./providers/DrawerProvider";
 import { QueryClientProvider } from "./providers/QueryClientProvider";
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <StyledComponentsRegistry>
       <ThemeProvider theme={theme}>
@@ -50,4 +46,5 @@ export const MainCss = styled.main`
   width: 100%;
   height: 100%;
   background: ${(p) => p.theme.colors.white};
+  overflow: auto;
 `;

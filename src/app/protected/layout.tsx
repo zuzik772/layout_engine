@@ -8,9 +8,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
   return (
     <WrapperCss>
       <SideNavigation />
-      <ModuleGroupProvider>
-        <MainCss>{children}</MainCss>
-      </ModuleGroupProvider>
+      <ModuleGroupProvider>{children}</ModuleGroupProvider>
     </WrapperCss>
   );
 }
@@ -18,10 +16,4 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
 const WrapperCss = styled.div`
   display: flex;
   gap: 1rem;
-`;
-
-const MainCss = styled.main`
-  width: 100%;
-  height: 100%;
-  background: ${(p) => p.theme.colors.white};
 `;

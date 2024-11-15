@@ -11,7 +11,6 @@ import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
 import AntDrawer from "@/app/components/drawer/Drawer";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { ModuleSpecsTable } from "@/app/components/table/ModuleSpecsTable";
-import { FlexContainer } from "@/app/components/ModuleGroupsHeader";
 
 export default function ModuleSpecsPage() {
   const { openDrawer } = useDrawerContext();
@@ -21,7 +20,9 @@ export default function ModuleSpecsPage() {
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>([]);
+  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
+    []
+  );
 
   useEffect(() => {
     getModuleGroupSpecs(id).then((data) => {
@@ -39,12 +40,15 @@ export default function ModuleSpecsPage() {
   const moduleGroupSpec = moduleGroups.find((spec) => spec.id === id);
 
   return (
-    <FlexContainer>
+    <div>
       <FlexContainer>
         <Link href="../">Go back</Link>
         <h2>{moduleGroupSpec?.name}</h2>
         <Wrapper>
-          <SelectableDropdown moduleSpecs={allModuleSpecs} setModuleSpecs={setModuleSpecs} />
+          <SelectableDropdown
+            moduleSpecs={allModuleSpecs}
+            setModuleSpecs={setModuleSpecs}
+          />
         </Wrapper>
         <button onClick={handleImport}>Import Specs</button>
         <button onClick={() => setSelectedModuleSpecs([])}>Delete</button>
@@ -53,7 +57,7 @@ export default function ModuleSpecsPage() {
         <ModuleSpecsTable />
         <AntDrawer />
       </TableWrapper>
-    </FlexContainer>
+    </div>
   );
 }
 
@@ -67,4 +71,14 @@ const TableWrapper = styled.div`
   width: 100%;
   height: calc(-140px + 100vh);
   overflow-y: auto;
+`;
+
+const FlexContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  overflow: auto;
+  padding: 1rem 0;
 `;

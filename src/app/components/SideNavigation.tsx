@@ -50,8 +50,8 @@ export const WrapperCss = styled.nav`
     margin: 0;
   }
 
-  width: ${(p) => p.theme.sizes.sidebarWidth};
-  min-width: ${(p) => p.theme.sizes.sidebarWidth};
+  width: 200px;
+  min-width: 200px;
   background-color: ${(p) => p.theme.colors.sidebarBackground};
 `;
 

@@ -14,7 +14,7 @@ const ModuleGroupsHeader = () => {
 
 export default ModuleGroupsHeader;
 
-export const FlexContainer = styled.div`
+const FlexContainer = styled.div`
   display: flex;
   flex-grow: 1;
   justify-content: space-between;

@@ -3,7 +3,7 @@ const defaultColors = {
   black: "#000",
 
   gray50: "#fcfcfc",
-  gray100: "#f6f6f6",
+  gray100: "#fafafa",
   gray200: "#eeeeee",
   gray300: "#d9d8d8",
   gray400: "#cccccc",

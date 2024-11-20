@@ -12,7 +12,7 @@ import { ModuleGroup as ModuleGroupSpec, ModuleSpec } from "../data/typings";
 import axios from "axios";
 import Loading from "../loading";
 import { FlexCenterContainer } from "../components/layout/styling";
-import { getModuleGroups } from "../api/module-group-specs/api";
+import { getModuleGroups } from "../api/module-group-specs";
 
 type ModuleGroupContext = {
   memoizedModuleGroups: ModuleGroupSpec[];

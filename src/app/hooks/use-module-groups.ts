@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../data/query-keys";
-import { getModuleGroups } from "../api/module-group-specs/api";
+import { getModuleGroups } from "../api/module-group-specs";
 
-export function useModuleGroupSpecs() {
+export function useModuleGroups() {
   const queryClient = useQueryClient();
   const { isLoading, error, data } = useQuery({
     queryKey: [queryKeys.moduleGroups],

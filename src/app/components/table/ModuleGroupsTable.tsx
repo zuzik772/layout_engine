@@ -3,7 +3,7 @@
 import React from "react";
 import { Skeleton, Table } from "antd";
 import type { TableColumnsType } from "antd";
-import { useModuleGroupSpecs } from "@/app/hooks/use-module-groups";
+import { useModuleGroups } from "@/app/hooks/use-module-groups";
 import Link from "next/link";
 
 interface DataType {
@@ -20,15 +20,26 @@ const columns: TableColumnsType<DataType> = [
 ];
 
 export const ModuleGroupsTable = () => {
-  const moduleGroups = useModuleGroupSpecs();
+  const moduleGroups = useModuleGroups();
 
   if (!moduleGroups || !Array.isArray(moduleGroups)) {
     return <Skeleton active />;
   }
   const data: DataType[] = moduleGroups.map((moduleGroup) => ({
     key: moduleGroup.id,
-    name: <Link href={`/protected/modules/${moduleGroup.id}`}>{moduleGroup.name}</Link>,
+    name: (
+      <Link href={`/protected/modules/${moduleGroup.id}`}>
+        {moduleGroup.name}
+      </Link>
+    ),
   }));
 
-  return <Table<DataType> columns={columns} dataSource={data} pagination={false} sticky />;
+  return (
+    <Table<DataType>
+      columns={columns}
+      dataSource={data}
+      pagination={false}
+      sticky
+    />
+  );
 };

@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Skeleton, Table } from "antd";
+import { Button, Modal, Table } from "antd";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import { DeleteOutlined, MenuOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  ExclamationCircleFilled,
+  MenuOutlined,
+} from "@ant-design/icons";
 import styled from "styled-components";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
 import { ModuleSpec } from "@/app/data/typings";
-import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
+import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
+import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
 
 interface DataType {
   key: string;
@@ -19,31 +24,64 @@ interface DataType {
 }
 const DraggableTable: React.FC = () => {
   const { openDrawer } = useDrawerContext();
-
+  const { allModuleSpecs } = useModuleGroupProvider();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
+
+  const { isLoading, error, moduleGroupSpecs } = useModuleGroupSpecs(id);
 
   const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
     []
   );
 
   useEffect(() => {
-    getModuleGroupSpecs(id).then((data) => {
-      setSelectedModuleSpecs(data);
-    });
-  }, []);
+    if (moduleGroupSpecs) {
+      setSelectedModuleSpecs(moduleGroupSpecs);
+    } else {
+      console.error("Failed to fetch module group specs:", moduleGroupSpecs);
+    }
+  }, [moduleGroupSpecs]);
 
   useEffect(() => {
-    const initialData: DataType[] = selectedModuleSpecs.map((spec) => ({
-      key: spec.id,
-      name: spec.name,
-    }));
+    const initialData: DataType[] = selectedModuleSpecs.map((spec) => {
+      const moduleSpec = allModuleSpecs.find(
+        (s) => s.module_spec_id === spec.module_spec_id
+      );
+      return {
+        key: spec.id,
+        name: moduleSpec?.name || "",
+      };
+    });
 
     setData([...initialData]);
   }, [selectedModuleSpecs]);
 
   const [data, setData] = useState<DataType[]>([]);
-  console.log("data", data);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Failed to load module specs</div>;
+
+  const { deleteModuleSpec } = useModuleGroupSpecs(id);
+
+  const { confirm } = Modal;
+  const showDeleteConfirm = (spec: DataType) => {
+    console.log(spec);
+    confirm({
+      title: `Delete ${spec.name}?`,
+      icon: <ExclamationCircleFilled />,
+      content: "This will delete the module spec and all the configuration",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        deleteModuleSpec(Number(spec.key));
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
+  };
+
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
 
@@ -109,17 +147,7 @@ const DraggableTable: React.FC = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  Modal.confirm({
-                    title: `Delete ${data[rowIndex].name}`,
-                    content:
-                      "This will delete the module spec and all the configuration",
-                    footer: (_, { OkBtn, CancelBtn }) => (
-                      <>
-                        <CancelBtn />
-                        <OkBtn />
-                      </>
-                    ),
-                  });
+                  showDeleteConfirm(data[rowIndex]);
                 }}
               >
                 <DeleteOutlined />

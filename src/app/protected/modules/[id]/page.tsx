@@ -6,60 +6,53 @@ import SelectableDropdown from "@/app/components/ant/Dropdown";
 import styled from "styled-components";
 import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
 import { ModuleSpec } from "@/app/data/typings";
-import { useEffect, useMemo, useState } from "react";
-import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
+import { useEffect, useState } from "react";
+
 import AntDrawer from "@/app/components/drawer/Drawer";
-import { useDrawerContext } from "@/app/providers/DrawerProvider";
-import { ModuleSpecsTable } from "@/app/components/table/ModuleSpecsTable";
+import DragAndDropTable from "@/app/components/table/DragAndDropTable";
+import { getModuleGroupSpecs } from "@/app/api/module-group-spec-module-specs/[id]";
+import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 
 export default function ModuleSpecsPage() {
-  const { openDrawer } = useDrawerContext();
   const { memoizedModuleGroups } = useModuleGroupProvider();
   const moduleGroups = memoizedModuleGroups;
-  const { allModuleSpecs, setModuleSpecs } = useModuleGroupProvider();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
-
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
-    []
-  );
-
-  useEffect(() => {
-    getModuleGroupSpecs(id).then((data) => {
-      setSelectedModuleSpecs(data);
-    });
-  }, []);
+  const moduleGroupSpecs = useModuleGroupSpecs(id);
 
   function handleImport() {
-    getModuleGroupSpecs(id).then((data) => {
-      setSelectedModuleSpecs(data);
-    });
+    console.log("import data funciton");
   }
 
   //   sportsbook home etc.
   const moduleGroupSpec = moduleGroups.find((spec) => spec.id === id);
 
   return (
-    <div>
+    <Container>
       <FlexContainer>
         <Link href="../">Go back</Link>
         <h2>{moduleGroupSpec?.name}</h2>
         <Wrapper>
-          <SelectableDropdown
-            moduleSpecs={allModuleSpecs}
-            setModuleSpecs={setModuleSpecs}
-          />
+          <SelectableDropdown />
         </Wrapper>
         <button onClick={handleImport}>Import Specs</button>
-        <button onClick={() => setSelectedModuleSpecs([])}>Delete</button>
+        <button>Delete</button>
       </FlexContainer>
       <TableWrapper>
-        <ModuleSpecsTable />
+        {/* <ModuleSpecsTable /> */}
+        <DragAndDropTable />
+
         <AntDrawer />
       </TableWrapper>
-    </div>
+    </Container>
   );
 }
+
+const Container = styled.div`
+  width: 100%;
+  overflow: auto;
+  padding-right: 1rem;
+`;
 
 const Wrapper = styled.div`
   overflow: auto;

@@ -2,25 +2,32 @@ import React from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space, Typography } from "antd";
-import { ModuleSpec } from "@/app/data/typings";
+import { usePathname } from "next/navigation";
+import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
+import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 
-const SelectableDropdown = ({
-  moduleSpecs,
-  setModuleSpecs,
-}: {
-  moduleSpecs: ModuleSpec[];
-  setModuleSpecs: any;
-}) => {
-  const items: MenuProps["items"] = moduleSpecs.map((moduleSpec) => ({
+const SelectableDropdown = () => {
+  const { allModuleSpecs, setModuleSpecs } = useModuleGroupProvider();
+
+  const pathname = usePathname();
+  const id = Number(pathname.split("/")[3]);
+
+  const { addModuleSpec } = useModuleGroupSpecs(id);
+
+  const items: MenuProps["items"] = allModuleSpecs.map((moduleSpec) => ({
     key: moduleSpec.id.toString(),
     label: moduleSpec.name,
   }));
 
   const handleSelect: MenuProps["onSelect"] = (e) => {
-    const selectedModuleSpec = moduleSpecs.find(
+    const selectedModuleSpec = allModuleSpecs.find(
       (moduleSpec) => Number(moduleSpec.id) === Number(e.key)
     );
-    console.log(selectedModuleSpec);
+    if (!selectedModuleSpec) {
+      console.error("Selected module spec not found");
+      return;
+    }
+    addModuleSpec(selectedModuleSpec);
   };
 
   return (

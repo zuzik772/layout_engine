@@ -4,34 +4,36 @@ import React from "react";
 import { Skeleton, Table } from "antd";
 import type { TableColumnsType } from "antd";
 import { useModuleGroups } from "@/app/hooks/use-module-groups";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface DataType {
   key: React.Key;
   name: React.ReactNode;
 }
 
-const columns: TableColumnsType<DataType> = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    render: (text: string) => <a>{text}</a>,
-  },
-];
-
 export const ModuleGroupsTable = () => {
-  const moduleGroups = useModuleGroups();
+  const { isLoading, error, moduleGroups } = useModuleGroups();
+  const router = useRouter();
 
-  if (!moduleGroups || !Array.isArray(moduleGroups)) {
+  if (isLoading || !Array.isArray(moduleGroups)) {
     return <Skeleton active />;
   }
+
+  if (error) {
+    return <p>Failed to load module groups</p>;
+  }
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (name) => <>{name}</>,
+    },
+  ];
+
   const data: DataType[] = moduleGroups.map((moduleGroup) => ({
     key: moduleGroup.id,
-    name: (
-      <Link href={`/protected/modules/${moduleGroup.id}`}>
-        {moduleGroup.name}
-      </Link>
-    ),
+    name: moduleGroup.name,
   }));
 
   return (
@@ -40,6 +42,10 @@ export const ModuleGroupsTable = () => {
       dataSource={data}
       pagination={false}
       sticky
+      onRow={(record) => ({
+        onClick: () => router.push(`/protected/modules/${record.key}`),
+        style: { cursor: "pointer" },
+      })}
     />
   );
 };

@@ -3,40 +3,33 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import SelectableDropdown from "@/app/components/ant/Dropdown";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import styled from "styled-components";
-import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
-import { ModuleSpec } from "@/app/data/typings";
-import { useEffect, useState } from "react";
-
 import AntDrawer from "@/app/components/drawer/Drawer";
 import DragAndDropTable from "@/app/components/table/DragAndDropTable";
-import { getModuleGroupSpecs } from "@/app/api/module-group-spec-module-specs/[id]";
-import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
+import { useModuleGroups } from "@/app/hooks/use-module-groups";
+import { Button } from "antd";
 
 export default function ModuleSpecsPage() {
-  const { memoizedModuleGroups } = useModuleGroupProvider();
-  const moduleGroups = memoizedModuleGroups;
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
-  const moduleGroupSpecs = useModuleGroupSpecs(id);
-
-  function handleImport() {
-    console.log("import data funciton");
-  }
+  const { moduleGroups } = useModuleGroups();
 
   //   sportsbook home etc.
-  const moduleGroupSpec = moduleGroups.find((spec) => spec.id === id);
+  const moduleGroup = moduleGroups && moduleGroups.find((spec) => spec.id === id);
 
   return (
     <Container>
       <FlexContainer>
-        <Link href="../">Go back</Link>
-        <h2>{moduleGroupSpec?.name}</h2>
+        <Link href="../">
+          <Button>
+            <ArrowLeftOutlined />
+          </Button>
+        </Link>
+        <h2>{moduleGroup?.name}</h2>
         <Wrapper>
           <SelectableDropdown />
         </Wrapper>
-        <button onClick={handleImport}>Import Specs</button>
-        <button>Delete</button>
       </FlexContainer>
       <TableWrapper>
         {/* <ModuleSpecsTable /> */}

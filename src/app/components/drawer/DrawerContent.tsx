@@ -34,7 +34,7 @@ const DrawerContent = () => {
           </StyledFormItem>
         </Col>
         <Col span={12}>
-          <StyledFormItem name="type" label="Module type / Game collection" rules={[{ required: true, message: "Please choose the type" }]}>
+          <StyledFormItem name="type" label="Fields" rules={[{ required: true, message: "Please choose the type" }]}>
             <Select placeholder="Please choose the type">
               <Option value="all">All Games</Option>
               <Option value="favourites">Favourites</Option>

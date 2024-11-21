@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
-import {
-  DeleteOutlined,
-  ExclamationCircleFilled,
-  MenuOutlined,
-} from "@ant-design/icons";
+import { Button, Modal, Skeleton, Table } from "antd";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { DeleteOutlined, ExclamationCircleFilled, MenuOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
 import { ModuleSpec } from "@/app/data/typings";
 import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
-import { useModuleGroupProvider } from "@/app/providers/ModuleGroupProvider";
+import { useModuleSpecs } from "@/app/hooks/use-module-specs";
+import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 
 interface DataType {
   key: string;
@@ -24,29 +16,22 @@ interface DataType {
 }
 const DraggableTable: React.FC = () => {
   const { openDrawer } = useDrawerContext();
-  const { allModuleSpecs } = useModuleGroupProvider();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const { isLoading, error, moduleGroupSpecs } = useModuleGroupSpecs(id);
+  const { isLoading, error, moduleGroupSpecs, deleteModuleSpec } = useModuleGroupSpecs(id);
+  const { moduleSpecs } = useModuleSpecs();
+  const { specsPositions } = useSpecsPositions(id);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
-    []
-  );
+  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>([]);
 
   useEffect(() => {
-    if (moduleGroupSpecs) {
-      setSelectedModuleSpecs(moduleGroupSpecs);
-    } else {
-      console.error("Failed to fetch module group specs:", moduleGroupSpecs);
-    }
+    moduleGroupSpecs && setSelectedModuleSpecs(moduleGroupSpecs);
   }, [moduleGroupSpecs]);
 
   useEffect(() => {
     const initialData: DataType[] = selectedModuleSpecs.map((spec) => {
-      const moduleSpec = allModuleSpecs.find(
-        (s) => s.module_spec_id === spec.module_spec_id
-      );
+      const moduleSpec = moduleSpecs && moduleSpecs.find((s) => s.module_spec_id === spec.module_spec_id);
       return {
         key: spec.id,
         name: moduleSpec?.name || "",
@@ -56,12 +41,15 @@ const DraggableTable: React.FC = () => {
     setData([...initialData]);
   }, [selectedModuleSpecs]);
 
+  const previousPositions = specsPositions && specsPositions.map((spec) => spec.previous_position);
+  console.log("previousPositions", previousPositions);
+  const currentPositions = specsPositions && specsPositions.map((spec) => spec.current_position);
+  console.log("currentPositions", currentPositions);
+
   const [data, setData] = useState<DataType[]>([]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return isLoading && <Skeleton active />;
   if (error) return <div>Failed to load module specs</div>;
-
-  const { deleteModuleSpec } = useModuleGroupSpecs(id);
 
   const { confirm } = Modal;
   const showDeleteConfirm = (spec: DataType) => {
@@ -92,6 +80,13 @@ const DraggableTable: React.FC = () => {
     setData(updatedData);
     console.log("updatedData", updatedData);
     console.log("data", data);
+
+    // Prepare the payload for the API call
+    const payload = updatedData.map((item, index) => ({
+      id: item.key,
+      position: index,
+    }));
+    console.log("payload", payload);
   };
 
   const columns = [
@@ -100,12 +95,17 @@ const DraggableTable: React.FC = () => {
       dataIndex: "drag",
       key: "drag",
       width: 30,
-      render: (_: any, __: any, index: number) => (
-        <MenuOutlined style={{ cursor: "grab", color: "#999" }} />
-      ),
+      render: (_: any, __: any, index: number) => <MenuOutlined style={{ cursor: "grab", color: "#999" }} />,
     },
     {
-      title: "Name",
+      title: "#",
+      dataIndex: "order",
+      key: "order",
+      width: 30,
+      render: (_: any, __: any, index: number) => String(index + 1) + ".",
+    },
+    {
+      title: "Module Spec Name",
       dataIndex: "name",
       key: "name",
       onCell: (record: DataType) => ({
@@ -124,11 +124,7 @@ const DraggableTable: React.FC = () => {
     }
 
     return (
-      <Draggable
-        key={data[rowIndex].key}
-        draggableId={String(data[rowIndex].key)}
-        index={rowIndex}
-      >
+      <Draggable key={data[rowIndex].key} draggableId={String(data[rowIndex].key)} index={rowIndex}>
         {(provided, snapshot) => (
           <TableRow
             ref={provided.innerRef}
@@ -137,9 +133,7 @@ const DraggableTable: React.FC = () => {
             style={{ ...style, ...provided.draggableProps.style }}
           >
             <td {...provided.dragHandleProps}>
-              <MenuOutlined
-                style={{ cursor: "grab", color: "#999", padding: "8px" }}
-              />
+              <MenuOutlined style={{ cursor: "grab", color: "#999", padding: "8px" }} />
             </td>
 
             <FlexEndContainer>
@@ -193,26 +187,38 @@ export default DraggableTable;
 
 const StyledTable = styled.div`
   .ant-table-cell {
-    padding: 10px !important;
+    padding: 10px 0 !important;
     width: 100%;
   }
-  .ant-table-tbody {
-    display: flex;
+
+  table {
+    display: block;
   }
+
+  tbody {
+    display: flex;
+    flex-direction: column;
+  }
+
   .ant-table-tbody > tr {
     cursor: grab;
   }
-  .ant-table-thead > tr {
-    background: ${(p) => p.theme.colors.gray100};
+  .ant-table-thead {
+    display: block;
   }
-  .ant-table-thead > tr > th:nth-child(1) {
+
+  /* .ant-table-thead > tr {
+    display: flex;
+    gap: 1rem;
+  } */
+  .ant-table-thead > tr > th:nth-child(1),
+  .ant-table-thead > tr > th:nth-child(2) {
     width: 35px;
     height: 43px;
-    background: ${(p) => p.theme.colors.gray100};
+    text-align: center;
   }
-  .ant-table-thead > tr > th:nth-child(2) {
+  .ant-table-thead > tr > th:nth-child(3) {
     width: 100%;
-    background: ${(p) => p.theme.colors.gray100};
   }
 
   tr.dragging {
@@ -254,7 +260,12 @@ const TableRow = styled.tr`
 
 const FlexEndContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-grow: 1;
   align-items: center;
-  width: 100%;
+
+  td:first-child {
+    width: 35px;
+    text-align: center;
+    font-weight: 600;
+  }
 `;

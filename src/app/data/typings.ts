@@ -53,8 +53,7 @@ export type TargetContextType =
   | "sg-play:casino-slots:app:gb";
 
 export type SpecPosition = {
-  id: number;
+  module_group_spec_module_specs_id: number;
   module_group_spec_id: number;
-  previous_position: number;
   current_position: number;
 };

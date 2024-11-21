@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Skeleton, Table } from "antd";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { DeleteOutlined, ExclamationCircleFilled, MenuOutlined } from "@ant-design/icons";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
+import {
+  DeleteOutlined,
+  ExclamationCircleFilled,
+  MenuOutlined,
+} from "@ant-design/icons";
 import styled from "styled-components";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
@@ -13,17 +22,21 @@ import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 interface DataType {
   key: string;
   name: string;
+  current_position: number;
 }
 const DraggableTable: React.FC = () => {
   const { openDrawer } = useDrawerContext();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const { isLoading, error, moduleGroupSpecs, deleteModuleSpec } = useModuleGroupSpecs(id);
+  const { isLoading, error, moduleGroupSpecs, deleteModuleSpec } =
+    useModuleGroupSpecs(id);
   const { moduleSpecs } = useModuleSpecs();
-  const { specsPositions } = useSpecsPositions(id);
+  const { specsPositions, updateSpecsPositions } = useSpecsPositions(id);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>([]);
+  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
+    []
+  );
 
   useEffect(() => {
     moduleGroupSpecs && setSelectedModuleSpecs(moduleGroupSpecs);
@@ -31,20 +44,25 @@ const DraggableTable: React.FC = () => {
 
   useEffect(() => {
     const initialData: DataType[] = selectedModuleSpecs.map((spec) => {
-      const moduleSpec = moduleSpecs && moduleSpecs.find((s) => s.module_spec_id === spec.module_spec_id);
+      const moduleSpec = moduleSpecs?.find(
+        (s) => s.module_spec_id === spec.module_spec_id
+      );
+
+      const currentPosition = specsPositions?.find(
+        (pos) => pos.module_group_spec_module_specs_id === Number(spec.id)
+      )?.current_position;
       return {
         key: spec.id,
         name: moduleSpec?.name || "",
+        current_position: currentPosition !== undefined ? currentPosition : -1, // Default to -1 if not found
       };
     });
 
-    setData([...initialData]);
-  }, [selectedModuleSpecs]);
+    // Sort initialData based on current_position
+    initialData.sort((a, b) => a.current_position - b.current_position);
 
-  const previousPositions = specsPositions && specsPositions.map((spec) => spec.previous_position);
-  console.log("previousPositions", previousPositions);
-  const currentPositions = specsPositions && specsPositions.map((spec) => spec.current_position);
-  console.log("currentPositions", currentPositions);
+    setData([...initialData]);
+  }, [selectedModuleSpecs, moduleSpecs, specsPositions]);
 
   const [data, setData] = useState<DataType[]>([]);
 
@@ -78,15 +96,17 @@ const DraggableTable: React.FC = () => {
     updatedData.splice(destination.index, 0, movedRow);
 
     setData(updatedData);
-    console.log("updatedData", updatedData);
-    console.log("data", data);
 
     // Prepare the payload for the API call
     const payload = updatedData.map((item, index) => ({
-      id: item.key,
-      position: index,
+      module_group_spec_module_specs_id: Number(item.key),
+      module_group_spec_id: id,
+      current_position: index,
     }));
     console.log("payload", payload);
+
+    // Call the API to update the positions
+    updateSpecsPositions(payload);
   };
 
   const columns = [
@@ -95,7 +115,9 @@ const DraggableTable: React.FC = () => {
       dataIndex: "drag",
       key: "drag",
       width: 30,
-      render: (_: any, __: any, index: number) => <MenuOutlined style={{ cursor: "grab", color: "#999" }} />,
+      render: (_: any, __: any, index: number) => (
+        <MenuOutlined style={{ cursor: "grab", color: "#999" }} />
+      ),
     },
     {
       title: "#",
@@ -124,7 +146,11 @@ const DraggableTable: React.FC = () => {
     }
 
     return (
-      <Draggable key={data[rowIndex].key} draggableId={String(data[rowIndex].key)} index={rowIndex}>
+      <Draggable
+        key={data[rowIndex].key}
+        draggableId={String(data[rowIndex].key)}
+        index={rowIndex}
+      >
         {(provided, snapshot) => (
           <TableRow
             ref={provided.innerRef}
@@ -133,7 +159,9 @@ const DraggableTable: React.FC = () => {
             style={{ ...style, ...provided.draggableProps.style }}
           >
             <td {...provided.dragHandleProps}>
-              <MenuOutlined style={{ cursor: "grab", color: "#999", padding: "8px" }} />
+              <MenuOutlined
+                style={{ cursor: "grab", color: "#999", padding: "8px" }}
+              />
             </td>
 
             <FlexEndContainer>
@@ -207,10 +235,6 @@ const StyledTable = styled.div`
     display: block;
   }
 
-  /* .ant-table-thead > tr {
-    display: flex;
-    gap: 1rem;
-  } */
   .ant-table-thead > tr > th:nth-child(1),
   .ant-table-thead > tr > th:nth-child(2) {
     width: 35px;

@@ -23,14 +23,21 @@ const LayoutType = ({ isMobileContainer }: LayoutTypeProps) => {
   const [selectedWebRows, setSelectedWebRows] = useState<number>(1);
 
   // State to hold the currently displayed columns and rows based on layout
-  const [currentColumns, setCurrentColumns] = useState<number>(isMobileLayout ? selectedMobileColumns : selectedWebColumns);
-  const [currentRows, setCurrentRows] = useState<number>(isMobileLayout ? selectedMobileRows : selectedWebRows);
+  const [currentColumns, setCurrentColumns] = useState<number>(
+    isMobileLayout ? selectedMobileColumns : selectedWebColumns
+  );
+  const [currentRows, setCurrentRows] = useState<number>(
+    isMobileLayout ? selectedMobileRows : selectedWebRows
+  );
 
-  const layoutOptions = [
-    { label: "1/3", value: "1/3" }, //mobile has only 1 column layout
-    { label: "2/3", value: "2/3" },
-    { label: "3/3", value: "3/3" },
-  ];
+  let layoutOptions;
+  isMobileLayout
+    ? (layoutOptions = [{ label: "1/3", value: "1/3" }])
+    : (layoutOptions = [
+        { label: "1/3", value: "1/3" }, //mobile has only 1 column layout
+        { label: "2/3", value: "2/3" },
+        { label: "3/3", value: "3/3" },
+      ]);
 
   const handleLayoutChange: CheckboxProps["onChange"] = (e) => {
     if (isMobileLayout) {

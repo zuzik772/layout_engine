@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Skeleton, Table } from "antd";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { Button, Modal, Skeleton, Space, Table } from "antd";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import {
   DeleteOutlined,
+  DesktopOutlined,
   ExclamationCircleFilled,
+  EyeInvisibleOutlined,
+  EyeOutlined,
   MenuOutlined,
+  MobileOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
@@ -22,21 +21,18 @@ import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 interface DataType {
   key: string;
   name: string;
-  current_position: number;
 }
 const DraggableTable: React.FC = () => {
-  const { openDrawer } = useDrawerContext();
+  const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const { isLoading, error, moduleGroupSpecs, deleteModuleSpec } =
-    useModuleGroupSpecs(id);
+  const { isLoading, error, moduleGroupSpecs, deleteModuleSpec } = useModuleGroupSpecs(id);
   const { moduleSpecs } = useModuleSpecs();
-  const { specsPositions, updateSpecsPositions } = useSpecsPositions(id);
+  const { specsPositions } = useSpecsPositions(id);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
-    []
-  );
+  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>([]);
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     moduleGroupSpecs && setSelectedModuleSpecs(moduleGroupSpecs);
@@ -44,25 +40,18 @@ const DraggableTable: React.FC = () => {
 
   useEffect(() => {
     const initialData: DataType[] = selectedModuleSpecs.map((spec) => {
-      const moduleSpec = moduleSpecs?.find(
-        (s) => s.module_spec_id === spec.module_spec_id
-      );
-
-      const currentPosition = specsPositions?.find(
-        (pos) => pos.module_group_spec_module_specs_id === Number(spec.id)
-      )?.current_position;
+      const moduleSpec = moduleSpecs && moduleSpecs.find((s) => s.module_spec_id === spec.module_spec_id);
       return {
         key: spec.id,
         name: moduleSpec?.name || "",
-        current_position: currentPosition !== undefined ? currentPosition : -1, // Default to -1 if not found
       };
     });
 
-    // Sort initialData based on current_position
-    initialData.sort((a, b) => a.current_position - b.current_position);
-
     setData([...initialData]);
-  }, [selectedModuleSpecs, moduleSpecs, specsPositions]);
+  }, [selectedModuleSpecs]);
+
+  const currentPositions = specsPositions && specsPositions.map((spec) => spec.current_position);
+  console.log("currentPositions", currentPositions);
 
   const [data, setData] = useState<DataType[]>([]);
 
@@ -96,17 +85,15 @@ const DraggableTable: React.FC = () => {
     updatedData.splice(destination.index, 0, movedRow);
 
     setData(updatedData);
+    console.log("updatedData", updatedData);
+    console.log("data", data);
 
     // Prepare the payload for the API call
     const payload = updatedData.map((item, index) => ({
-      module_group_spec_module_specs_id: Number(item.key),
-      module_group_spec_id: id,
-      current_position: index,
+      id: item.key,
+      position: index,
     }));
     console.log("payload", payload);
-
-    // Call the API to update the positions
-    updateSpecsPositions(payload);
   };
 
   const columns = [
@@ -115,26 +102,65 @@ const DraggableTable: React.FC = () => {
       dataIndex: "drag",
       key: "drag",
       width: 30,
-      render: (_: any, __: any, index: number) => (
-        <MenuOutlined style={{ cursor: "grab", color: "#999" }} />
-      ),
+      render: (_: any, __: any, index: number) => <MenuOutlined style={{ cursor: "grab", color: "#999" }} />,
     },
-    {
-      title: "#",
-      dataIndex: "order",
-      key: "order",
-      width: 30,
-      render: (_: any, __: any, index: number) => String(index + 1) + ".",
-    },
+    // {
+    //   title: "#",
+    //   dataIndex: "order",
+    //   key: "order",
+    //   width: 30,
+    //   render: (_: any, __: any, index: number) => String(index + 1) + ".",
+    // },
     {
       title: "Module Spec Name",
       dataIndex: "name",
       key: "name",
+      // onCell: (record: DataType) => ({
+      //   onClick: () => {
+      //     openDrawer(record.name);
+      //   },
+      // }),
+    },
+    {
+      title: (
+        <Space>
+          Mobile <MobileOutlined />
+        </Space>
+      ),
+      dataIndex: "mobile",
+      key: "mobile",
       onCell: (record: DataType) => ({
         onClick: () => {
-          openDrawer(record.name);
+          showMobileDrawer(record.name);
         },
       }),
+      render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
+    },
+    {
+      title: (
+        <Space>
+          Desktop <DesktopOutlined />
+        </Space>
+      ),
+      dataIndex: "desktop",
+      key: "desktop",
+      onCell: (record: DataType) => ({
+        onClick: () => {
+          showDesktopDrawer(record.name);
+        },
+      }),
+      render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
+    },
+    {
+      title: "Disabled",
+      dataIndex: "disabled",
+      key: "disabled",
+
+      render: (_: any, __: any, index: number) => (
+        <TextCss>
+          {disabled ? <EyeInvisibleOutlined onClick={() => setDisabled(!disabled)} /> : <EyeOutlined onClick={() => setDisabled(!disabled)} />}
+        </TextCss>
+      ),
     },
   ];
 
@@ -146,11 +172,7 @@ const DraggableTable: React.FC = () => {
     }
 
     return (
-      <Draggable
-        key={data[rowIndex].key}
-        draggableId={String(data[rowIndex].key)}
-        index={rowIndex}
-      >
+      <Draggable key={data[rowIndex].key} draggableId={String(data[rowIndex].key)} index={rowIndex}>
         {(provided, snapshot) => (
           <TableRow
             ref={provided.innerRef}
@@ -159,9 +181,7 @@ const DraggableTable: React.FC = () => {
             style={{ ...style, ...provided.draggableProps.style }}
           >
             <td {...provided.dragHandleProps}>
-              <MenuOutlined
-                style={{ cursor: "grab", color: "#999", padding: "8px" }}
-              />
+              <MenuOutlined style={{ cursor: "grab", color: "#999", padding: "8px" }} />
             </td>
 
             <FlexEndContainer>
@@ -215,36 +235,58 @@ export default DraggableTable;
 
 const StyledTable = styled.div`
   .ant-table-cell {
-    padding: 10px 0 !important;
+    padding: 0 !important;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    :first-child {
+      justify-content: start;
+    }
+    :last-child {
+      justify-content: start;
+    }
   }
 
-  table {
+  /* table {
     display: block;
-  }
+  } */
 
-  tbody {
+  /* tbody {
     display: flex;
     flex-direction: column;
-  }
+  } */
 
   .ant-table-tbody > tr {
     cursor: grab;
   }
-  .ant-table-thead {
+  /* .ant-table-thead {
     display: block;
-  }
+  } */
 
-  .ant-table-thead > tr > th:nth-child(1),
-  .ant-table-thead > tr > th:nth-child(2) {
+  /* .ant-table-thead > tr {
+    display: flex;
+    gap: 1rem;
+  } */
+  .ant-table-thead > tr > th:first-child {
     width: 35px;
     height: 43px;
-    text-align: center;
+    padding-right: 2rem;
   }
-  .ant-table-thead > tr > th:nth-child(3) {
+  /* .ant-table-thead > tr > th:nth-child(2) {
     width: 100%;
+    background: purple;
+  } */
+  th.ant-table-cell {
+    padding: 10px !important;
+    display: flex;
+    justify-content: center;
+    :last-child {
+      justify-content: center;
+    }
+    :nth-child(2) {
+      justify-content: start;
+    }
   }
-
   tr.dragging {
     background: ${(p) => p.theme.colors.gray100};
   }
@@ -261,13 +303,15 @@ const TableRow = styled.tr`
   border-bottom: 1px solid ${(p) => p.theme.colors.gray200};
   :hover {
     background: ${(p) => p.theme.colors.gray100};
-    cursor: pointer;
+    /* cursor: pointer; */
   }
 
   button {
     display: none;
     box-shadow: none;
     z-index: 100;
+    position: absolute;
+    right: 0;
   }
 
   :hover {
@@ -283,13 +327,21 @@ const TableRow = styled.tr`
 `;
 
 const FlexEndContainer = styled.div`
+  position: relative;
   display: flex;
   flex-grow: 1;
   align-items: center;
+  justify-content: end;
 
-  td:first-child {
+  /* td:first-child {
     width: 35px;
     text-align: center;
     font-weight: 600;
-  }
+  } */
+`;
+
+const TextCss = styled.span`
+  color: ${(p) => p.theme.colors.primary500};
+  padding: 10px;
+  cursor: pointer;
 `;

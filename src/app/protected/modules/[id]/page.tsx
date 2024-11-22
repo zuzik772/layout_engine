@@ -5,10 +5,11 @@ import Link from "next/link";
 import SelectableDropdown from "@/app/components/ant/Dropdown";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import styled from "styled-components";
-import AntDrawer from "@/app/components/drawer/Drawer";
 import DragAndDropTable from "@/app/components/table/DragAndDropTable";
 import { useModuleGroups } from "@/app/hooks/use-module-groups";
 import { Button } from "antd";
+import DesktopDrawer from "@/app/components/drawer/DesktopDrawer";
+import MobileDrawer from "@/app/components/drawer/MobileDrawer";
 
 export default function ModuleSpecsPage() {
   const pathname = usePathname();
@@ -34,8 +35,8 @@ export default function ModuleSpecsPage() {
       <TableWrapper>
         {/* <ModuleSpecsTable /> */}
         <DragAndDropTable />
-
-        <AntDrawer />
+        <MobileDrawer />
+        <DesktopDrawer />
       </TableWrapper>
     </Container>
   );

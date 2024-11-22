@@ -5,8 +5,8 @@ import { Drawer, Button, Space } from "antd";
 import DrawerContent from "./DrawerContent";
 import LayoutTypeProvider from "./layout/LayoutProvider";
 
-function AntDrawer() {
-  const { drawerOpen, closeDrawer, selectedItemId } = useDrawerContext();
+function DesktopDrawer() {
+  const { size, drawerOpen, closeDrawer, selectedItemId } = useDrawerContext();
 
   console.log("selectedItemId", selectedItemId);
   return (
@@ -14,7 +14,7 @@ function AntDrawer() {
       <Drawer
         title={"Edit " + selectedItemId}
         placement="right"
-        size={"large"}
+        size={size}
         onClose={closeDrawer}
         open={drawerOpen}
         footer={
@@ -34,4 +34,4 @@ function AntDrawer() {
   );
 }
 
-export default AntDrawer;
+export default DesktopDrawer;

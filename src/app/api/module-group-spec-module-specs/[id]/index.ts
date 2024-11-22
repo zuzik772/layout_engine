@@ -35,3 +35,15 @@ export async function deleteModuleGroupSpec(id: number) {
     throw error;
   }
 }
+
+export async function updateModuleGroupSpec(id: number, isDisabled: boolean) {
+  try {
+    console.log("update module group spec", id, isDisabled);
+    const res = await axios.put(`/api/module-group-spec-module-specs/${id}`, isDisabled);
+    console.log("res data", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Error updating module group specs:", error);
+    throw error;
+  }
+}

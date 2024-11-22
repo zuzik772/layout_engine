@@ -1,3 +1,4 @@
+import { DrawerProps } from "antd";
 import React, { useState, createContext, useContext } from "react";
 
 type Optional<T> = T | undefined;
@@ -9,11 +10,13 @@ interface DrawerValuesDto {
   drawerOpen: boolean;
   selectedItemId: Optional<string>;
   keyboardDisabled: boolean;
+  size?: DrawerProps["size"];
 }
 
 interface DrawerContextDto extends DrawerValuesDto {
   setDrawerLoading: (loading: boolean) => void;
-  openDrawer: (id: string) => void;
+  showMobileDrawer: (id: string) => void;
+  showDesktopDrawer: (id: string) => void;
   closeDrawer: () => void;
   setKeyboardDisabled: (disabled: boolean) => void;
 }
@@ -28,7 +31,7 @@ interface DrawerProviderProps {
 function DrawerProvider(props: DrawerProviderProps) {
   const [drawerLoading, setDrawerLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerState, setDrawerState] = useState<DrawerStateDto>();
+  const [size, setSize] = useState<DrawerProps["size"]>();
   const [selectedItemId, setSelectedItemId] = useState<Optional<string>>();
   const [keyboardDisabled, setKeyboardDisabled] = useState(false);
 
@@ -36,8 +39,15 @@ function DrawerProvider(props: DrawerProviderProps) {
     setDrawerOpen(false);
   };
 
-  const openDrawer = (id: string) => {
+  const showMobileDrawer = (id: string) => {
     setSelectedItemId(id);
+    setSize("default");
+    setDrawerOpen(true);
+  };
+
+  const showDesktopDrawer = (id: string) => {
+    setSelectedItemId(id);
+    setSize("large");
     setDrawerOpen(true);
   };
 
@@ -47,7 +57,9 @@ function DrawerProvider(props: DrawerProviderProps) {
         drawerLoading,
         setDrawerLoading,
         drawerOpen: props.stayClosed ? false : drawerOpen,
-        openDrawer,
+        size,
+        showMobileDrawer,
+        showDesktopDrawer,
         closeDrawer,
         selectedItemId,
         keyboardDisabled,

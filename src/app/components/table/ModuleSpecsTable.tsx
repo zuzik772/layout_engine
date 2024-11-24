@@ -31,7 +31,7 @@ const rowSelection: TableProps<DataType>["rowSelection"] = {
 };
 
 export const ModuleSpecsTable = () => {
-  const { openDrawer } = useDrawerContext();
+  const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
 
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
@@ -62,7 +62,7 @@ export const ModuleSpecsTable = () => {
       pagination={false}
       sticky
       onRow={(spec) => ({
-        onClick: () => openDrawer(spec.name),
+        onClick: () => showDesktopDrawer(spec.name),
       })}
     />
   );

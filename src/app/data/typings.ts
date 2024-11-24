@@ -2,7 +2,7 @@ export type ModuleSpec = {
   module_spec_id: string;
   name: string;
   id: string;
-  is_disabled: boolean;
+  disabled: boolean;
 };
 
 export type ModuleGroup = {

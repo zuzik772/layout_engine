@@ -3,17 +3,23 @@ import { createClient } from "../../../../../utils/supabase/client";
 
 const supabase = createClient();
 
-export async function GET(req: NextRequest, { params }: { params: { id: number } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
   const { id } = params;
   if (!id) {
-    return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
+    );
   }
 
-  const { data: moduleGroupSpecModuleSpecs, error: moduleGroupSpecError } = await supabase
-    .from("module_group_spec_module_specs")
-    .select("*")
-    .eq("module_group_spec_id", id);
-
+  const { data: moduleGroupSpecModuleSpecs, error: moduleGroupSpecError } =
+    await supabase
+      .from("module_group_spec_module_specs")
+      .select("*")
+      .eq("module_group_spec_id", id);
   if (moduleGroupSpecError) {
     return NextResponse.json(moduleGroupSpecError, { status: 500 });
   }
@@ -21,14 +27,22 @@ export async function GET(req: NextRequest, { params }: { params: { id: number }
   return NextResponse.json(moduleGroupSpecModuleSpecs, { status: 200 });
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: number } }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
   const { id } = params;
   const { module_spec_id } = await req.json();
 
   if (!id) {
-    return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
+    );
   }
-  const { data, error } = await supabase.from("module_group_spec_module_specs").insert([{ module_spec_id, module_group_spec_id: id }]);
+  const { data, error } = await supabase
+    .from("module_group_spec_module_specs")
+    .insert([{ module_spec_id, module_group_spec_id: id }]);
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -38,15 +52,24 @@ export async function POST(req: NextRequest, { params }: { params: { id: number 
 }
 
 //delete route
-export async function DELETE(req: NextRequest, { params }: { params: { id: number } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
   const { id } = params;
 
   console.log("DELETE module group spec", id);
 
   if (!id) {
-    return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
+    );
   }
-  const { data, error } = await supabase.from("module_group_spec_module_specs").delete().eq("id", id);
+  const { data, error } = await supabase
+    .from("module_group_spec_module_specs")
+    .delete()
+    .eq("id", id);
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -55,22 +78,29 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: numbe
   return NextResponse.json(data, { status: 200 });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
   const { id } = params;
-  const { module_spec_id } = await req.json();
 
   if (!id) {
-    return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
+    );
   }
-  const body = await req.json();
-  console.log("body", body);
-  const { data: isDisabled, error } = await supabase.from("module_group_spec_module_specs").upsert(body, {
-    onConflict: "module_group_spec_module_specs_id",
-  });
+
+  const body: boolean = await req.json();
+
+  const { data, error } = await supabase
+    .from("module_group_spec_module_specs")
+    .upsert(body, { onConflict: "id" });
 
   if (error) {
+    console.error("Supabase error:", error);
     return NextResponse.json(error, { status: 500 });
   }
 
-  return NextResponse.json(isDisabled, { status: 200 });
+  return NextResponse.json(data, { status: 200 });
 }

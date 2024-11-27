@@ -23,7 +23,6 @@ import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
-import { Module } from "module";
 
 interface DataType {
   key: string;
@@ -179,6 +178,7 @@ const DraggableTable: React.FC = () => {
       title: "Disabled",
       dataIndex: "disabled",
       key: "disabled",
+      className: "allow-events",
 
       render: (_: any, record: any, index: number) => (
         <TextCss>
@@ -209,7 +209,9 @@ const DraggableTable: React.FC = () => {
           <TableRow
             ref={provided.innerRef}
             {...provided.draggableProps}
-            className={`${className} ${snapshot.isDragging ? "dragging" : ""}`}
+            className={`${className} ${snapshot.isDragging ? "dragging" : ""} ${
+              data[rowIndex].disabled ? "dissabled-row" : ""
+            } `}
             style={{ ...style, ...provided.draggableProps.style }}
           >
             <td {...provided.dragHandleProps}>
@@ -257,7 +259,7 @@ const DraggableTable: React.FC = () => {
               rowKey="key"
               pagination={false}
               sticky
-              rowClassName={(record) => (record.disabled ? "disabled" : "")}
+              rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
             />
           )}
         </Droppable>
@@ -281,8 +283,12 @@ const StyledTable = styled.div`
       justify-content: start;
     }
   }
-  .disabled {
-    opacity: 0.5 !important;
+  .disabled-row {
+    opacity: 0.3 !important;
+    pointer-events: none;
+    .allow-events {
+      pointer-events: initial;
+    }
   }
   .ant-table-tbody > tr {
     cursor: grab;

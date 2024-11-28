@@ -1,4 +1,3 @@
-// app/styled-components.tsx
 "use client";
 
 import { useServerInsertedHTML } from "next/navigation";

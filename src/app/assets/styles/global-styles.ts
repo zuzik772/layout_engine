@@ -41,12 +41,12 @@ export const GlobalStyle = createGlobalStyle`
 
   input, textarea, select{
     &:focus {
-      color: ${(p) => p.theme.colors.gray500} !important;
+      color: ${(p) => p.theme.colors.gray900} !important;
       box-shadow: none !important;
     }
 
     &::placeholder {
-      color: ${(p) => p.theme.colors.gray600} !important;
+      color: ${(p) => p.theme.colors.gray900} !important;
     }
   }
 

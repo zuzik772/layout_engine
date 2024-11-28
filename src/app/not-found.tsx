@@ -1,4 +1,4 @@
-import { FlexCenterContainer } from "./auth/layout";
+import { FlexCenterContainer } from "./(auth-pages)/layout";
 
 const NotFound = () => {
   return (

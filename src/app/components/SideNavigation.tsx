@@ -1,10 +1,25 @@
+import Link from "next/link";
 import styled from "styled-components";
+import { signOutAction } from "../actions";
+import { ButtonCss } from "../(auth-pages)/sign-in/page";
 
 const SideNavigation = () => {
   return (
     <WrapperCss>
       <SideNavigationCss>
-        <SideNavigationItemCss>Module CMS</SideNavigationItemCss>
+        <div>
+          <SideNavigationItemCss>
+            <Link href={"/protected"}>Module CMS</Link>
+          </SideNavigationItemCss>
+          <SideNavigationItemCss>
+            <Link href={"/protected/preview"}>Preview</Link>
+          </SideNavigationItemCss>
+        </div>
+        <form action={signOutAction}>
+          <ButtonCss block type="primary" htmlType="submit">
+            Sign out
+          </ButtonCss>
+        </form>
       </SideNavigationCss>
     </WrapperCss>
   );
@@ -19,6 +34,8 @@ const WrapperCss = styled.nav`
 
   overflow: hidden;
   display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
   flex-direction: column;
   height: calc(100vh - ${(p) => p.theme.sizes.headerHeight});
 
@@ -40,9 +57,11 @@ const WrapperCss = styled.nav`
 const SideNavigationCss = styled.ul`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   padding: ${(p) => p.theme.sizes.spacing4};
   padding-top: ${(p) => p.theme.sizes.spacingXs};
   flex-grow: 1;
+  height: 100%;
 `;
 
 const SideNavigationItemCss = styled.li`

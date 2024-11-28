@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styled from "styled-components";
 import { signOutAction } from "../actions";
-import { ButtonCss } from "../(auth-pages)/sign-in/page";
+import { ButtonCss } from "./form/styling";
 
 const SideNavigation = () => {
   return (
@@ -27,7 +27,7 @@ const SideNavigation = () => {
 
 export default SideNavigation;
 
-const WrapperCss = styled.nav`
+export const WrapperCss = styled.nav`
   position: relative;
   box-sizing: border-box;
   contain: strict;
@@ -50,7 +50,8 @@ const WrapperCss = styled.nav`
     margin: 0;
   }
 
-  width: ${(p) => p.theme.sizes.sidebarWidth};
+  width: 200px;
+  min-width: 200px;
   background-color: ${(p) => p.theme.colors.sidebarBackground};
 `;
 

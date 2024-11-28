@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
-import { FlexCenterContainer } from "./(auth-pages)/layout";
-import { ButtonCss, LargeHeadingCss } from "./(auth-pages)/sign-in/page";
 import Link from "next/link";
+import { LargeHeadingCss, ButtonCss } from "./components/form/styling";
+import { FlexCenterContainer } from "./components/layout/styling";
 
 async function HomePage() {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.getUser();
-  console.log(data);
-  console.log(error);
   if (error || !data?.user) {
     redirect("/sign-in");
   }

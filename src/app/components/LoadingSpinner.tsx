@@ -25,7 +25,7 @@ const SpinnerSvgCss = styled.svg`
     animation: dash 1.3s ease-in-out infinite;
     stroke-linecap: round;
     stroke-width: 3px;
-    stroke: ${(p) => p.color || p.theme.colors.primary500};
+    stroke: #073bc5;
   }
 
   @keyframes rotate {

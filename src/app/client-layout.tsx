@@ -8,23 +8,28 @@ import { GlobalStyle } from "./assets/styles/global-styles";
 import Header from "./components/Header";
 import NextTopLoader from "nextjs-toploader";
 import StyledComponentsRegistry from "./styled-components";
+import AuthProvider from "./providers/AuthProvider";
+import DrawerProvider from "./providers/DrawerProvider";
+import { QueryClientProvider } from "./providers/QueryClientProvider";
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <StyledComponentsRegistry>
       <ThemeProvider theme={theme}>
         <AntdRegistry>
           <AntdConfigProvider>
-            <NextTopLoader height={4} showSpinner={false} />
-            <GlobalStyle />
-            <Header />
-            <WrapperCss>
-              <MainCss>{children}</MainCss>
-            </WrapperCss>
+            <QueryClientProvider>
+              <NextTopLoader height={4} showSpinner={false} />
+              <GlobalStyle />
+              <AuthProvider>
+                <DrawerProvider>
+                  <Header />
+                  <WrapperCss>
+                    <MainCss>{children}</MainCss>
+                  </WrapperCss>
+                </DrawerProvider>
+              </AuthProvider>
+            </QueryClientProvider>
           </AntdConfigProvider>
         </AntdRegistry>
       </ThemeProvider>
@@ -41,4 +46,5 @@ export const MainCss = styled.main`
   width: 100%;
   height: 100%;
   background: ${(p) => p.theme.colors.white};
+  overflow: auto;
 `;

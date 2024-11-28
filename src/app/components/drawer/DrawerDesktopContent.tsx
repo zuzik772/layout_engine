@@ -1,12 +1,15 @@
-import { Form, Row, Col, Input, Select, Radio } from "antd";
+import { Form, Row, Col, Input, Select, Radio, Button } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import ContainerMode from "./ContainerMode";
 import { useDebouncedCallback } from "use-debounce";
 import DesktopLayoutConfiguration from "./layout/DesktopLayoutConfiguration";
+import { ContainerCss, Wrapper } from "./DrawerMobileContent";
+import { useDrawerContext } from "@/app/providers/DrawerProvider";
 
 const DrawerDesktopContent = () => {
-  const [isMobileContainer, setIsMobileContainer] = useState(false);
+  const { selectedSpecId, closeDrawer, drawerState, setDrawerState } = useDrawerContext();
+  const [isContainer, setisContainer] = useState(false);
   const [value, setValue] = useState("");
   const debounced = useDebouncedCallback(
     (value) => {
@@ -18,41 +21,35 @@ const DrawerDesktopContent = () => {
 
   return (
     <Form layout="vertical" hideRequiredMark>
-      <Row gutter={16}>
-        <Col span={12}>
-          <StyledFormItem
-            name="title"
-            label="Title"
-            rules={[{ required: true, message: "Please enter title" }]}
-          >
-            <Input
-              placeholder="Please enter title"
-              onChange={(e) => debounced(e.target.value)}
-            />
-          </StyledFormItem>
-        </Col>
-        <Col span={12}>
-          <StyledFormItem
-            name="type"
-            label="Type"
-            rules={[{ required: true, message: "Please choose the type" }]}
-          >
-            <Select placeholder="Please choose the type">
-              <Option value="all">All Games</Option>
-              <Option value="favourites">Favourites</Option>
-            </Select>
-          </StyledFormItem>
-        </Col>
-      </Row>
+      <ContainerCss>
+        <Row gutter={16}>
+          <Col span={12}>
+            <StyledFormItem name="title" label="Title" rules={[{ required: true, message: "Please enter title" }]}>
+              <Input placeholder="Please enter title" onChange={(e) => debounced(e.target.value)} />
+            </StyledFormItem>
+          </Col>
+          <Col span={12}>
+            <StyledFormItem name="type" label="Type" rules={[{ required: true, message: "Please choose the type" }]}>
+              <Select placeholder="Please choose the type">
+                <Option value="all">All Games</Option>
+                <Option value="favourites">Favourites</Option>
+              </Select>
+            </StyledFormItem>
+          </Col>
+        </Row>
 
-      {/* Equivalent to Boxed attribute */}
-      <ContainerMode
-        isChecked={isMobileContainer}
-        onChange={(e) => setIsMobileContainer(e.target.checked)}
-      />
+        {/* Equivalent to Boxed attribute */}
+        <ContainerMode isChecked={isContainer} onChange={(e) => setisContainer(e.target.checked)} />
 
-      {/* Equivalent to fillColumns attribute */}
-      <DesktopLayoutConfiguration isMobileContainer />
+        {/* Equivalent to fillColumns attribute */}
+        <DesktopLayoutConfiguration isContainer={isContainer} title={value} />
+      </ContainerCss>
+      <Wrapper>
+        <Button onClick={closeDrawer}>Cancel</Button>
+        <Button type="primary" htmlType="submit">
+          Publish
+        </Button>
+      </Wrapper>
     </Form>
   );
 };

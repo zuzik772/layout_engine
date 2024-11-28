@@ -139,7 +139,7 @@ function DrawerMobileContent() {
     <>
       {contextHolder}
       <Form form={form} onFinish={onFinish} layout="vertical" hideRequiredMark initialValues={selectedMobileConfig}>
-        <div>
+        <ContainerCss>
           <StyledFormItem name="title" label="Title" rules={[{ required: true, message: "Please enter title" }]}>
             <Input placeholder="Please enter title" onChange={(e) => handleTitleChange(e)} value={form.getFieldValue("title")} />
           </StyledFormItem>
@@ -156,7 +156,7 @@ function DrawerMobileContent() {
           />
           {/* Equivalent to fillColumns attribute */}
           <MobileLayoutConfiguration isMobileContainer={form.getFieldValue("boxed")} title={form.getFieldValue("title")} />
-        </div>
+        </ContainerCss>
         <Wrapper>
           <Button onClick={closeDrawer}>Cancel</Button>
           <Button type="primary" htmlType="submit">
@@ -179,4 +179,9 @@ const Wrapper = styled(Space)`
   justify-content: flex-end;
   padding: 16px;
   border-top: 1px solid #e9e9e9;
+  background: white;
+`;
+
+const ContainerCss = styled.div`
+  padding-bottom: 40px;
 `;

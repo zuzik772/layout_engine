@@ -1,4 +1,14 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+import withFonts from "next-fonts";
+import withPlugins from "next-compose-plugins";
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  compiler: {
+    styledComponents: {
+      ssr: true,
+      displayName: true,
+    },
+  },
+};
+
+export default withPlugins([withFonts], nextConfig);

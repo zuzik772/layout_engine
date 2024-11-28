@@ -58,3 +58,12 @@ export type SpecPosition = {
   module_group_spec_id: number;
   current_position: number;
 };
+
+export type MobileLayoutConfig = {
+  spec_id: number;
+  title?: string;
+  type?: string;
+  columns?: number;
+  rows?: number;
+  boxed?: boolean;
+};

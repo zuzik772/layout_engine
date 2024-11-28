@@ -1,5 +1,5 @@
 import { Checkbox, Form, Row, Col, CheckboxProps } from "antd";
-import { StyledFormItem } from "./DrawerContent";
+import { StyledFormItem } from "./DrawerDesktopContent";
 
 interface ContainerModeProps {
   isChecked: boolean;

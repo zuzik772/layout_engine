@@ -23,7 +23,8 @@
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^18.2.0",
     "styled-components": "5.3.10",
-    "styled-normalize": "^8.1.1"
+    "styled-normalize": "^8.1.1",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@types/node": "^20",

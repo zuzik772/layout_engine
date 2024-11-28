@@ -8,8 +8,8 @@ import styled from "styled-components";
 import DragAndDropTable from "@/app/components/table/DragAndDropTable";
 import { useModuleGroups } from "@/app/hooks/use-module-groups";
 import { Button } from "antd";
-import DesktopDrawer from "@/app/components/drawer/DesktopDrawer";
-import MobileDrawer from "@/app/components/drawer/MobileDrawer";
+import AntDrawer from "@/app/components/drawer/AntDrawer";
+import LayoutTypeProvider from "@/app/components/drawer/layout/LayoutProvider";
 
 export default function ModuleSpecsPage() {
   const pathname = usePathname();
@@ -17,7 +17,8 @@ export default function ModuleSpecsPage() {
   const { moduleGroups } = useModuleGroups();
 
   //   sportsbook home etc.
-  const moduleGroup = moduleGroups && moduleGroups.find((spec) => spec.id === id);
+  const moduleGroup =
+    moduleGroups && moduleGroups.find((spec) => spec.id === id);
 
   return (
     <Container>
@@ -34,9 +35,10 @@ export default function ModuleSpecsPage() {
       </FlexContainer>
       <TableWrapper>
         {/* <ModuleSpecsTable /> */}
-        <DragAndDropTable />
-        <MobileDrawer />
-        <DesktopDrawer />
+        <LayoutTypeProvider>
+          <DragAndDropTable />
+          <AntDrawer />
+        </LayoutTypeProvider>
       </TableWrapper>
     </Container>
   );

@@ -23,6 +23,7 @@ import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
+import { useLayoutTypeContext } from "../drawer/layout/LayoutProvider";
 
 interface DataType {
   key: string;
@@ -32,6 +33,7 @@ interface DataType {
 }
 const DraggableTable: React.FC = () => {
   const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
+  const { isMobileLayout, setIsMobileLayout } = useLayoutTypeContext();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
@@ -140,7 +142,7 @@ const DraggableTable: React.FC = () => {
       ),
     },
     {
-      title: "Module Spec Name",
+      title: "Name",
       dataIndex: "name",
       key: "name",
     },
@@ -154,7 +156,8 @@ const DraggableTable: React.FC = () => {
       key: "mobile",
       onCell: (record: DataType) => ({
         onClick: () => {
-          showMobileDrawer(record.name);
+          showMobileDrawer(Number(record.key), record.name);
+          setIsMobileLayout(true);
         },
       }),
       render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
@@ -169,7 +172,8 @@ const DraggableTable: React.FC = () => {
       key: "desktop",
       onCell: (record: DataType) => ({
         onClick: () => {
-          showDesktopDrawer(record.name);
+          showDesktopDrawer(Number(record.key), record.name);
+          setIsMobileLayout(false);
         },
       }),
       render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,

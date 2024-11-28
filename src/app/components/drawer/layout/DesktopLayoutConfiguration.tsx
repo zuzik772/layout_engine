@@ -1,7 +1,9 @@
 import { Row, Col, Radio, CheckboxProps, Select } from "antd";
-import React, { use, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyledFormItem } from "../DrawerDesktopContent";
 import LayoutPreview from "./LayoutPreview";
+import { useDrawerContext } from "@/app/providers/DrawerProvider";
+import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
 
 type DesktopLayoutConfigurationProps = {
   isContainer: boolean;
@@ -9,17 +11,49 @@ type DesktopLayoutConfigurationProps = {
 };
 
 const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigurationProps) => {
+  const { selectedSpecId, desktopLayoutConfig, setDesktopLayoutConfig } = useDrawerContext();
+  const { desktopConfig, isLoading } = useDesktopLayoutConfig(selectedSpecId);
   const [selectedWebColumns, setSelectedWebColumns] = useState<number>(1);
   const [selectedWebLayout, setSelectedWebLayout] = useState("3/3");
   const [selectedWebRows, setSelectedWebRows] = useState<number>(1);
   const { Option } = Select;
 
+  const selectedDesktopConfig = Array.isArray(desktopConfig) ? desktopConfig[0] : desktopConfig;
+  const selectedDesktopColumns = selectedDesktopConfig?.columns ?? 1;
+  const selectedMobileRows = selectedDesktopConfig?.rows ?? 1;
+
+  const [columns, setColumns] = useState(selectedDesktopColumns?.columns ?? 1);
+  const [rows, setRows] = useState(selectedMobileRows?.rows ?? 1);
+
+  useEffect(() => {
+    if (desktopConfig) {
+      setDesktopLayoutConfig(selectedDesktopConfig);
+      setColumns(selectedDesktopConfig?.columns ?? 1);
+      setRows(selectedDesktopConfig?.rows ?? 1);
+    }
+  }, [desktopConfig, selectedDesktopConfig, selectedSpecId]);
+
   const handleColumnsChange = (value: number) => {
-    console.log(value);
-    setSelectedWebColumns(value);
+    setColumns(value);
+    selectedSpecId &&
+      setDesktopLayoutConfig({
+        ...desktopLayoutConfig,
+        spec_id: selectedSpecId,
+        columns: value,
+      });
   };
   const handleRowsChange = (value: number) => {
-    setSelectedWebRows(value);
+    setRows(value);
+    selectedSpecId &&
+      setDesktopLayoutConfig({
+        ...desktopLayoutConfig,
+        spec_id: selectedSpecId,
+        rows: value,
+      });
+  };
+  const handleLayoutChange: CheckboxProps["onChange"] = (e) => {
+    console.log(e.target.value);
+    setSelectedWebLayout(e.target.value);
   };
 
   const layoutOptions = [
@@ -27,21 +61,16 @@ const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigu
     { label: "2/3", value: "2/3" },
     { label: "3/3", value: "3/3" },
   ];
-
-  const handleLayoutChange: CheckboxProps["onChange"] = (e) => {
-    console.log(e.target.value);
-    setSelectedWebLayout(e.target.value);
-  };
-
+  console.log("number of columns, rows", columns, rows);
   return (
     <>
       <Row gutter={16}>
         <Col span={24}>
-          <StyledFormItem label={"Screen size"}>
+          <StyledFormItem name="layout_option" label={"Screen size"}>
             <Radio.Group
               block
               options={layoutOptions}
-              defaultValue="3/3"
+              defaultValue={selectedWebLayout}
               optionType="button"
               onChange={handleLayoutChange}
               value={selectedWebLayout}
@@ -51,8 +80,8 @@ const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigu
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-          <StyledFormItem label={"Columns"}>
-            <Select value={selectedWebColumns} onChange={handleColumnsChange}>
+          <StyledFormItem name="columns" label="Columns">
+            <Select value={columns} onChange={handleColumnsChange}>
               {Array.from({ length: 8 }, (_, i) => i + 1).map((i) => (
                 <Option key={i} value={i}>
                   {i}
@@ -62,8 +91,8 @@ const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigu
           </StyledFormItem>
         </Col>
         <Col span={12}>
-          <StyledFormItem label={"Rows"}>
-            <Select value={selectedWebRows} onChange={handleRowsChange}>
+          <StyledFormItem name="rows" label="Rows">
+            <Select value={rows} onChange={handleRowsChange}>
               {Array.from({ length: 8 }, (_, i) => i + 1).map((i) => (
                 <Option key={i} value={i}>
                   {i}
@@ -73,13 +102,7 @@ const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigu
           </StyledFormItem>
         </Col>
       </Row>
-      <LayoutPreview
-        selectedLayout={selectedWebLayout}
-        numberOfColumns={selectedWebColumns}
-        numberOfRows={selectedWebRows}
-        isContainer={isContainer}
-        title={title}
-      />
+      <LayoutPreview selectedLayout={selectedWebLayout} numberOfColumns={columns} numberOfRows={rows} isContainer={isContainer} title={title} />
     </>
   );
 };

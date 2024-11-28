@@ -12,8 +12,8 @@ import { MobileLayoutConfig } from "@/app/data/typings";
 import styled from "styled-components";
 
 function DrawerMobileContent() {
-  const { mobileLayoutConfig, setMobileLayoutConfig, selectedSpecId, closeDrawer } = useDrawerContext();
-  const { mobileConfig, addMobileConfiguration, isLoading } = useMobileLayoutConfig(selectedSpecId);
+  const { mobileLayoutConfig, setMobileLayoutConfig, selectedSpecId, closeDrawer, drawerState, setDrawerState } = useDrawerContext();
+  const { mobileConfig, addMobileConfiguration, updateMobileConfiguration, isLoading } = useMobileLayoutConfig(selectedSpecId);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const { Option } = Select;
@@ -35,8 +35,10 @@ function DrawerMobileContent() {
         ...defaultValue,
         ...selectedMobileConfig,
       });
+      setDrawerState("edit");
     } else {
       form.setFieldsValue(defaultValue);
+      setDrawerState("create");
     }
   }, [selectedSpecId, mobileConfig, form]);
 
@@ -79,7 +81,7 @@ function DrawerMobileContent() {
       });
   };
 
-  const onFinish = (values: MobileLayoutConfig) => {
+  const onFinish = async (values: MobileLayoutConfig) => {
     console.log(values);
     if (!values.title || !values.type) {
       messageApi.open({
@@ -89,15 +91,43 @@ function DrawerMobileContent() {
       return;
     }
 
-    if (selectedSpecId) {
-      const updatedConfig = { ...values, spec_id: selectedSpecId };
+    // if (selectedSpecId) {
+    //   const updatedConfig = { ...values, spec_id: selectedSpecId };
+    //   setMobileLayoutConfig(updatedConfig);
+    //   addMobileConfiguration(updatedConfig); // Submit the updated config
+    //   messageApi.open({
+    //     type: "success",
+    //     content: "Configuration published successfully!",
+    //   });
+    //   closeDrawer();
+    // }
+    const updatedConfig = { ...values, spec_id: selectedSpecId };
+
+    try {
+      if (drawerState === "edit") {
+        console.log("updating config", updatedConfig);
+        // Make a PATCH request
+        await updateMobileConfiguration(updatedConfig);
+        messageApi.open({
+          type: "success",
+          content: "Configuration updated successfully!",
+        });
+      } else {
+        console.log("creating config", updatedConfig);
+        // Make a POST request
+        await addMobileConfiguration(updatedConfig);
+        messageApi.open({
+          type: "success",
+          content: "Configuration created successfully!",
+        });
+      }
       setMobileLayoutConfig(updatedConfig);
-      addMobileConfiguration(updatedConfig); // Submit the updated config
-      messageApi.open({
-        type: "success",
-        content: "Configuration published successfully!",
-      });
       closeDrawer();
+    } catch (error) {
+      messageApi.open({
+        type: "error",
+        content: "An error occurred while saving the configuration.",
+      });
     }
   };
 

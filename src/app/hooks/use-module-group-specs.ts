@@ -15,7 +15,6 @@ export function useModuleGroupSpecs(id: number) {
     queryFn: () => getModuleGroupSpecs(id),
     initialData: () => {
       const cachedData = queryClient.getQueryData<ModuleSpec[]>(queryKey);
-      console.log("cachedData", cachedData);
       return cachedData;
     },
   });

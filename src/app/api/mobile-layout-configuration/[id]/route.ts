@@ -28,3 +28,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: number 
   if (error) return NextResponse.json(error, { status: 500 });
   return NextResponse.json(data, { status: 200 });
 }
+
+export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
+  const { id } = params;
+  if (!id) {
+    return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
+  }
+
+  const body = await req.json();
+  console.log("whats body", body);
+  const { data, error } = await supabase.from("mobile_layout_configuration").upsert(body, { onConflict: "spec_id" });
+
+  if (error) return NextResponse.json(error, { status: 500 });
+  return NextResponse.json(data, { status: 200 });
+}

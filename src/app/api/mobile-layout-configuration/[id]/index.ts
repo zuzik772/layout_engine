@@ -20,3 +20,14 @@ export async function addMobileConfig(id: number, config: MobileLayoutConfig) {
     throw error;
   }
 }
+
+export async function updateMobileConfig(id: number, config: MobileLayoutConfig) {
+  try {
+    console.log("about to update following config", config);
+    const res = await axios.put(`/api/mobile-layout-configuration/${id}`, config);
+    return res.data;
+  } catch (error) {
+    console.error("Error updating mobile config:", error);
+    throw error;
+  }
+}

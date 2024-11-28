@@ -3,7 +3,6 @@ import axios from "axios";
 
 export async function getModuleGroupSpecs(id: number): Promise<ModuleSpec[]> {
   try {
-    console.log("id", id);
     const res = await axios.get(`/api/module-group-spec-module-specs/${id}`);
     return res.data;
   } catch (error) {
@@ -39,10 +38,7 @@ export async function deleteModuleGroupSpec(id: number) {
 export async function updateModuleGroupSpec(spec: ModuleSpec) {
   try {
     const { id } = spec;
-    const res = await axios.put(
-      `/api/module-group-spec-module-specs/${id}`,
-      spec
-    );
+    const res = await axios.put(`/api/module-group-spec-module-specs/${id}`, spec);
     return res.data;
   } catch (error) {
     console.error("Error updating module group specs:", error);

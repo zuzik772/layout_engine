@@ -1,4 +1,4 @@
-import { Row, Col, Select, Skeleton, Form } from "antd";
+import { Row, Col, Select, Skeleton } from "antd";
 import React, { useEffect, useState } from "react";
 import { StyledFormItem } from "../DrawerDesktopContent";
 import { GridCell, InternalGrid, LayoutPreviewCss, TitlePreview, WrapperCss } from "./LayoutPreview";
@@ -13,7 +13,6 @@ type MobileLayoutConfigurationProps = {
 const MobileLayoutConfiguration = ({ isMobileContainer, title }: MobileLayoutConfigurationProps) => {
   const { selectedSpecId, mobileLayoutConfig, setMobileLayoutConfig } = useDrawerContext();
   const { mobileConfig, isLoading } = useMobileLayoutConfig(selectedSpecId);
-  const [form] = Form.useForm();
   const selectedMobileConfig = Array.isArray(mobileConfig) ? mobileConfig[0] : mobileConfig;
   const selectedMobileColumns = selectedMobileConfig?.columns ?? 1;
   const selectedMobileRows = selectedMobileConfig?.rows ?? 1;
@@ -58,7 +57,7 @@ const MobileLayoutConfiguration = ({ isMobileContainer, title }: MobileLayoutCon
           <Row gutter={16}>
             <Col span={12}>
               <StyledFormItem name="columns" label="Columns">
-                <Select value={form.getFieldValue("columns")} onChange={handleColumnsChange}>
+                <Select value={columns} onChange={handleColumnsChange}>
                   {Array.from({ length: 8 }, (_, i) => i + 1).map((i) => (
                     <Option key={i} value={i}>
                       {i}
@@ -69,7 +68,7 @@ const MobileLayoutConfiguration = ({ isMobileContainer, title }: MobileLayoutCon
             </Col>
             <Col span={12}>
               <StyledFormItem name="rows" label="Rows">
-                <Select value={form.getFieldValue("rows")} onChange={handleRowsChange}>
+                <Select value={rows} onChange={handleRowsChange}>
                   {Array.from({ length: 8 }, (_, i) => i + 1).map((i) => (
                     <Option key={i} value={i}>
                       {i}

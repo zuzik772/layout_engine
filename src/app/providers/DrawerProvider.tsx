@@ -1,6 +1,5 @@
 import { DrawerProps } from "antd";
-import { get } from "http";
-import React, { useState, createContext, useContext, use, useEffect } from "react";
+import React, { useState, createContext, useContext } from "react";
 import { getMobileConfig } from "../api/mobile-layout-configuration/[id]";
 
 type Optional<T> = T | undefined;
@@ -10,6 +9,7 @@ type DrawerStateDto = "edit" | "create";
 interface DrawerValuesDto {
   drawerLoading: boolean;
   drawerOpen: boolean;
+  drawerState?: DrawerStateDto;
   selectedSpecId: number;
   selectedSpecName: string;
   size?: DrawerProps["size"];
@@ -18,6 +18,7 @@ interface DrawerValuesDto {
 
 interface DrawerContextDto extends DrawerValuesDto {
   setDrawerLoading: (loading: boolean) => void;
+  setDrawerState: (state: DrawerStateDto | undefined) => void;
   showMobileDrawer: (id: number, name: string) => void;
   showDesktopDrawer: (id: number, name: string) => void;
   closeDrawer: () => void;
@@ -43,6 +44,7 @@ export interface MobileLayoutConfig {
 function DrawerProvider(props: DrawerProviderProps) {
   const [drawerLoading, setDrawerLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerState, setDrawerState] = useState<DrawerStateDto>();
   const [size, setSize] = useState<DrawerProps["size"]>();
   const [selectedSpecId, setSelectedSpecId] = useState<number>(0);
   const [selectedSpecName, setSelectedSpecName] = useState<string>("");
@@ -50,6 +52,7 @@ function DrawerProvider(props: DrawerProviderProps) {
 
   const closeDrawer = () => {
     setDrawerOpen(false);
+    setDrawerState(undefined);
   };
 
   const showMobileDrawer = (id: number, name: string) => {
@@ -75,6 +78,8 @@ function DrawerProvider(props: DrawerProviderProps) {
         drawerLoading,
         setDrawerLoading,
         drawerOpen: props.stayClosed ? false : drawerOpen,
+        drawerState,
+        setDrawerState,
         size,
         showMobileDrawer,
         showDesktopDrawer,

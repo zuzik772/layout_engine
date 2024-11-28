@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MobileLayoutConfig } from "../data/typings";
-import { addMobileConfig, getMobileConfig } from "../api/mobile-layout-configuration/[id]";
+import { addMobileConfig, getMobileConfig, updateMobileConfig } from "../api/mobile-layout-configuration/[id]";
 import { queryKeys } from "../data/query-keys";
 
 export function useMobileLayoutConfig(id: number) {
@@ -15,7 +15,6 @@ export function useMobileLayoutConfig(id: number) {
     queryFn: () => getMobileConfig(id),
     initialData: () => {
       const cachedData = queryClient.getQueryData<MobileLayoutConfig>(queryKey);
-      console.log("cachedData", cachedData);
       return cachedData;
     },
   });
@@ -44,10 +43,32 @@ export function useMobileLayoutConfig(id: number) {
     },
   });
 
+  const updateMobileConfigMutation = useMutation({
+    mutationFn: (newConfig: MobileLayoutConfig) => updateMobileConfig(id, newConfig),
+    onMutate: async (newConfig: MobileLayoutConfig) => {
+      await queryClient.cancelQueries({
+        queryKey,
+      });
+      const previousMobileConfig = queryClient.getQueryData<MobileLayoutConfig>(queryKey);
+      queryClient.setQueryData<MobileLayoutConfig>(queryKey, newConfig);
+      return { previousMobileConfig };
+    },
+    onError: (err, newConfig, context) => {
+      queryClient.setQueryData<MobileLayoutConfig>(queryKey, context?.previousMobileConfig);
+      console.error("Error updating mobile config:", err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey,
+      });
+    },
+  });
+
   return {
     isLoading,
     error,
     mobileConfig,
     addMobileConfiguration: addMobileConfigMutation.mutate,
+    updateMobileConfiguration: updateMobileConfigMutation.mutate,
   };
 }

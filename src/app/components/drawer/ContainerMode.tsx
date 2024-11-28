@@ -12,7 +12,7 @@ const ContainerMode = ({ isChecked, onChange }: ContainerModeProps) => {
       <Col span={24}>
         <StyledFormItem
           label="Container Mode"
-          name="container"
+          name="boxed"
           style={{
             border: isChecked ? "1px solid #d9d9d9" : "none",
             padding: "8px",

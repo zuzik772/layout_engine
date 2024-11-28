@@ -11,13 +11,7 @@ interface LayoutPreviewProps {
   title?: string;
 }
 
-const LayoutPreview = ({
-  selectedLayout,
-  numberOfColumns,
-  numberOfRows,
-  isMobileContainer,
-  title,
-}: LayoutPreviewProps) => {
+const LayoutPreview = ({ selectedLayout, numberOfColumns, numberOfRows, isMobileContainer, title }: LayoutPreviewProps) => {
   // Determines the span width based on the selected layout (1/3, 2/3, 3/3)
   const getLayoutSpan = () => {
     switch (selectedLayout) {
@@ -37,25 +31,16 @@ const LayoutPreview = ({
         <StyledFormItem label={"Layout Preview"}>
           <WrapperCss>
             {selectedLayout && (
-              <LayoutPreviewCss
-                selectedLayout={selectedLayout}
-                span={getLayoutSpan()}
-                isMobileContainer={isMobileContainer}
-              >
+              <LayoutPreviewCss selectedLayout={selectedLayout} span={getLayoutSpan()} isMobileContainer={isMobileContainer}>
                 <TitlePreview>{title}</TitlePreview>
                 {/* Nested Grid for Columns and Rows */}
-                <InternalGrid
-                  numberOfColumns={numberOfColumns}
-                  numberOfRows={numberOfRows}
-                >
-                  {Array.from({ length: numberOfColumns * numberOfRows }).map(
-                    (_, index) => (
-                      <GridCell key={index}>
-                        {/* C{Math.floor(index / numberOfColumns) + 1}R
+                <InternalGrid numberOfColumns={numberOfColumns} numberOfRows={numberOfRows}>
+                  {Array.from({ length: numberOfColumns * numberOfRows }).map((_, index) => (
+                    <GridCell key={index}>
+                      {/* C{Math.floor(index / numberOfColumns) + 1}R
                       {(index % numberOfRows) + 1} */}
-                      </GridCell>
-                    )
-                  )}
+                    </GridCell>
+                  ))}
                 </InternalGrid>
               </LayoutPreviewCss>
             )}
@@ -68,7 +53,7 @@ const LayoutPreview = ({
 
 export default LayoutPreview;
 
-const LayoutPreviewCss = styled.div<{
+export const LayoutPreviewCss = styled.div<{
   selectedLayout: string;
   span: number;
   isMobileContainer: boolean;
@@ -80,40 +65,35 @@ const LayoutPreviewCss = styled.div<{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: ${({ isMobileContainer }) =>
-    isMobileContainer ? " 1px solid #b4b4b4;" : "none"};
+  border: ${({ isMobileContainer }) => (isMobileContainer ? " 1px solid #b4b4b4;" : "none")};
   padding: 12px;
-  background-color: ${({ isMobileContainer }) =>
-    isMobileContainer ? "#f0f0f0" : "transparent"};
+  background-color: ${({ isMobileContainer }) => (isMobileContainer ? "#f0f0f0" : "transparent")};
   p {
     place-self: start;
     padding-bottom: 12px;
   }
 `;
 
-const WrapperCss = styled.div`
+export const WrapperCss = styled.div`
   display: flex;
   div {
     border-radius: 8px;
   }
 `;
 
-const InternalGrid = styled.div<{
+export const InternalGrid = styled.div<{
   numberOfColumns: number;
   numberOfRows: number;
 }>`
   display: grid;
-  grid-template-columns: repeat(
-    ${({ numberOfColumns }) => numberOfColumns},
-    1fr
-  );
+  grid-template-columns: repeat(${({ numberOfColumns }) => numberOfColumns}, 1fr);
   grid-template-rows: repeat(${({ numberOfRows }) => numberOfRows}, 1fr);
   gap: 8px;
   width: 100%;
   height: 100%;
 `;
 
-const GridCell = styled.div`
+export const GridCell = styled.div`
   height: 24px;
   display: flex;
   align-items: center;
@@ -124,6 +104,6 @@ const GridCell = styled.div`
   color: #333;
 `;
 
-const TitlePreview = styled.p`
+export const TitlePreview = styled.p`
   text-align: start;
 `;

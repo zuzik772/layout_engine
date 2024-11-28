@@ -4,7 +4,6 @@ import axios from "axios";
 export async function getMobileConfig(id: number): Promise<MobileLayoutConfig> {
   try {
     const res = await axios.get(`/api/mobile-layout-configuration/${id}`);
-    console.log("mobile config", res.data);
     return res.data;
   } catch (error) {
     console.error("Error fetching mobile config:", error);
@@ -14,10 +13,7 @@ export async function getMobileConfig(id: number): Promise<MobileLayoutConfig> {
 
 export async function addMobileConfig(id: number, config: MobileLayoutConfig) {
   try {
-    const res = await axios.post(
-      `/api/mobile-layout-configuration/${id}`,
-      config
-    );
+    const res = await axios.post(`/api/mobile-layout-configuration/${id}`, config);
     return res.data;
   } catch (error) {
     console.error("Error posting mobile config:", error);

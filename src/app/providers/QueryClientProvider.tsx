@@ -21,11 +21,5 @@ export const QueryClientProvider = ({ children }: PropsWithChildren) => {
       },
     },
   });
-  const defaultOptions = queryClient.getDefaultOptions();
-  console.log("defaultOptions", defaultOptions);
-  return (
-    <QueryClientContext.Provider value={queryClient}>
-      {children}
-    </QueryClientContext.Provider>
-  );
+  return <QueryClientContext.Provider value={queryClient}>{children}</QueryClientContext.Provider>;
 };

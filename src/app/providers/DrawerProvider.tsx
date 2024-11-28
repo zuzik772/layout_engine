@@ -1,4 +1,6 @@
+import { DrawerProps } from "antd";
 import React, { useState, createContext, useContext } from "react";
+import { getMobileConfig } from "../api/mobile-layout-configuration/[id]";
 
 type Optional<T> = T | undefined;
 
@@ -7,15 +9,20 @@ type DrawerStateDto = "edit" | "create";
 interface DrawerValuesDto {
   drawerLoading: boolean;
   drawerOpen: boolean;
-  selectedItemId: Optional<string>;
-  keyboardDisabled: boolean;
+  drawerState?: DrawerStateDto;
+  selectedSpecId: number;
+  selectedSpecName: string;
+  size?: DrawerProps["size"];
+  mobileLayoutConfig: MobileLayoutConfig | undefined;
 }
 
 interface DrawerContextDto extends DrawerValuesDto {
   setDrawerLoading: (loading: boolean) => void;
-  openDrawer: (id: string) => void;
+  setDrawerState: (state: DrawerStateDto | undefined) => void;
+  showMobileDrawer: (id: number, name: string) => void;
+  showDesktopDrawer: (id: number, name: string) => void;
   closeDrawer: () => void;
-  setKeyboardDisabled: (disabled: boolean) => void;
+  setMobileLayoutConfig: (config: Optional<MobileLayoutConfig>) => void;
 }
 
 const DrawerContext = createContext<DrawerContextDto>({} as DrawerContextDto);
@@ -25,19 +32,43 @@ interface DrawerProviderProps {
   children: React.ReactNode;
 }
 
+export interface MobileLayoutConfig {
+  spec_id: number;
+  title?: string;
+  type?: string;
+  columns?: number;
+  rows?: number;
+  boxed?: boolean;
+}
+
 function DrawerProvider(props: DrawerProviderProps) {
   const [drawerLoading, setDrawerLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerState, setDrawerState] = useState<DrawerStateDto>();
-  const [selectedItemId, setSelectedItemId] = useState<Optional<string>>();
-  const [keyboardDisabled, setKeyboardDisabled] = useState(false);
+  const [size, setSize] = useState<DrawerProps["size"]>();
+  const [selectedSpecId, setSelectedSpecId] = useState<number>(0);
+  const [selectedSpecName, setSelectedSpecName] = useState<string>("");
+  const [mobileLayoutConfig, setMobileLayoutConfig] = useState<MobileLayoutConfig>();
 
   const closeDrawer = () => {
     setDrawerOpen(false);
+    setDrawerState(undefined);
   };
 
-  const openDrawer = (id: string) => {
-    setSelectedItemId(id);
+  const showMobileDrawer = (id: number, name: string) => {
+    setSelectedSpecId(id);
+    setSelectedSpecName(name);
+    setSize("default");
+    setDrawerOpen(true);
+    getMobileConfig(id).then((config) => {
+      setMobileLayoutConfig(config);
+    });
+  };
+
+  const showDesktopDrawer = (id: number, name: string) => {
+    setSelectedSpecId(id);
+    setSelectedSpecName(name);
+    setSize("large");
     setDrawerOpen(true);
   };
 
@@ -47,11 +78,16 @@ function DrawerProvider(props: DrawerProviderProps) {
         drawerLoading,
         setDrawerLoading,
         drawerOpen: props.stayClosed ? false : drawerOpen,
-        openDrawer,
+        drawerState,
+        setDrawerState,
+        size,
+        showMobileDrawer,
+        showDesktopDrawer,
         closeDrawer,
-        selectedItemId,
-        keyboardDisabled,
-        setKeyboardDisabled,
+        selectedSpecId,
+        selectedSpecName,
+        mobileLayoutConfig,
+        setMobileLayoutConfig,
       }}
     >
       {props.children}

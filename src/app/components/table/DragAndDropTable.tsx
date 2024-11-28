@@ -1,49 +1,84 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Skeleton, Table } from "antd";
+import { Button, Modal, Skeleton, Space, Table } from "antd";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { DeleteOutlined, MenuOutlined } from "@ant-design/icons";
+  DeleteOutlined,
+  DesktopOutlined,
+  ExclamationCircleFilled,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  MenuOutlined,
+  MobileOutlined,
+} from "@ant-design/icons";
 import styled from "styled-components";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
 import { ModuleSpec } from "@/app/data/typings";
-import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
+import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
+import { useModuleSpecs } from "@/app/hooks/use-module-specs";
+import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
+import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
+import { useLayoutTypeContext } from "../drawer/layout/LayoutProvider";
 
 interface DataType {
   key: string;
   name: string;
+  current_position: number;
+  disabled: boolean;
 }
 const DraggableTable: React.FC = () => {
-  const { openDrawer } = useDrawerContext();
-
+  const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
+  const { setIsMobileLayout } = useLayoutTypeContext();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
-    []
-  );
+  const { isLoading, error, moduleGroupSpecs, deleteModuleSpec, updateModuleSpec } = useModuleGroupSpecs(id);
+  const { moduleSpecs } = useModuleSpecs();
+  const { specsPositions } = useSpecsPositions(id);
 
   useEffect(() => {
-    getModuleGroupSpecs(id).then((data) => {
-      setSelectedModuleSpecs(data);
-    });
-  }, []);
+    const initialData: DataType[] =
+      moduleGroupSpecs?.map((spec) => {
+        const moduleSpec = moduleSpecs?.find((s) => s.module_spec_id === spec.module_spec_id);
+        const currentPosition = specsPositions?.find((pos) => pos.module_group_spec_module_specs_id === Number(spec.id))?.current_position;
+        return {
+          key: spec.id,
+          name: moduleSpec?.name || "",
+          current_position: currentPosition !== undefined ? currentPosition : -1, // Default to -1 if not found
+          disabled: spec.disabled,
+        };
+      }) || [];
 
-  useEffect(() => {
-    const initialData: DataType[] = selectedModuleSpecs.map((spec) => ({
-      key: spec.id,
-      name: spec.name,
-    }));
+    // Sort initialData based on current_position
+    initialData.sort((a, b) => a.current_position - b.current_position);
 
     setData([...initialData]);
-  }, [selectedModuleSpecs]);
+  }, [moduleGroupSpecs, moduleSpecs, specsPositions]);
 
   const [data, setData] = useState<DataType[]>([]);
-  console.log("data", data);
+
+  if (isLoading) return isLoading && <Skeleton active />;
+  if (error) return <div>Failed to load module specs</div>;
+
+  const { confirm } = Modal;
+  const showDeleteConfirm = (spec: DataType) => {
+    console.log(spec);
+    confirm({
+      title: `Delete ${spec.name}?`,
+      icon: <ExclamationCircleFilled />,
+      content: "This will delete the module spec and all the configuration",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        deleteModuleSpec(Number(spec.key));
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
+  };
+
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
 
@@ -52,29 +87,81 @@ const DraggableTable: React.FC = () => {
     updatedData.splice(destination.index, 0, movedRow);
 
     setData(updatedData);
-    console.log("updatedData", updatedData);
-    console.log("data", data);
+
+    // Prepare the payload for the API call
+    const payload = updatedData.map((item, index) => ({
+      module_group_spec_module_specs_id: Number(item.key),
+      module_group_spec_id: id,
+      current_position: index,
+    }));
+    console.log("payload", payload);
+
+    // Call the API to update the positions
+    updateSpecsPositions(id, payload);
   };
 
+  const handleDisabled = (record: DataType) => {
+    const moduleSpec = moduleGroupSpecs?.find((spec) => spec.id === record.key);
+    if (moduleSpec) {
+      updateModuleSpec({ ...moduleSpec, disabled: !record.disabled });
+    }
+  };
   const columns = [
     {
       title: "",
       dataIndex: "drag",
       key: "drag",
       width: 30,
-      render: (_: any, __: any, index: number) => (
-        <MenuOutlined style={{ cursor: "grab", color: "#999" }} />
-      ),
+      render: (_: any, __: any, index: number) => <MenuOutlined style={{ cursor: "grab", color: "#999" }} />,
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+    },
+    {
+      title: (
+        <Space>
+          Mobile <MobileOutlined />
+        </Space>
+      ),
+      dataIndex: "mobile",
+      key: "mobile",
       onCell: (record: DataType) => ({
         onClick: () => {
-          openDrawer(record.name);
+          showMobileDrawer(Number(record.key), record.name);
+          setIsMobileLayout(true);
         },
       }),
+      render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
+    },
+    {
+      title: (
+        <Space>
+          Desktop <DesktopOutlined />
+        </Space>
+      ),
+      dataIndex: "desktop",
+      key: "desktop",
+      onCell: (record: DataType) => ({
+        onClick: () => {
+          showDesktopDrawer(Number(record.key), record.name);
+          setIsMobileLayout(false);
+        },
+      }),
+      render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
+    },
+    {
+      title: "Disabled",
+      dataIndex: "disabled",
+      key: "disabled",
+      className: "allow-events",
+
+      render: (_: any, record: any, index: number) => (
+        <TextCss>
+          {record.disabled ? <EyeInvisibleOutlined onClick={() => handleDisabled(record)} /> : <EyeOutlined onClick={() => handleDisabled(record)} />}
+        </TextCss>
+      ),
     },
   ];
 
@@ -86,22 +173,16 @@ const DraggableTable: React.FC = () => {
     }
 
     return (
-      <Draggable
-        key={data[rowIndex].key}
-        draggableId={String(data[rowIndex].key)}
-        index={rowIndex}
-      >
+      <Draggable key={data[rowIndex].key} draggableId={String(data[rowIndex].key)} index={rowIndex}>
         {(provided, snapshot) => (
           <TableRow
             ref={provided.innerRef}
             {...provided.draggableProps}
-            className={`${className} ${snapshot.isDragging ? "dragging" : ""}`}
+            className={`${className} ${snapshot.isDragging ? "dragging" : ""} ${data[rowIndex].disabled ? "dissabled-row" : ""} `}
             style={{ ...style, ...provided.draggableProps.style }}
           >
             <td {...provided.dragHandleProps}>
-              <MenuOutlined
-                style={{ cursor: "grab", color: "#999", padding: "8px" }}
-              />
+              <MenuOutlined style={{ cursor: "grab", color: "#999", padding: "8px" }} />
             </td>
 
             <FlexEndContainer>
@@ -109,17 +190,7 @@ const DraggableTable: React.FC = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  Modal.confirm({
-                    title: `Delete ${data[rowIndex].name}`,
-                    content:
-                      "This will delete the module spec and all the configuration",
-                    footer: (_, { OkBtn, CancelBtn }) => (
-                      <>
-                        <CancelBtn />
-                        <OkBtn />
-                      </>
-                    ),
-                  });
+                  showDeleteConfirm(data[rowIndex]);
                 }}
               >
                 <DeleteOutlined />
@@ -153,6 +224,7 @@ const DraggableTable: React.FC = () => {
               rowKey="key"
               pagination={false}
               sticky
+              rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
             />
           )}
         </Droppable>
@@ -165,28 +237,43 @@ export default DraggableTable;
 
 const StyledTable = styled.div`
   .ant-table-cell {
-    padding: 10px !important;
+    padding: 0 !important;
     width: 100%;
-  }
-  .ant-table-tbody {
     display: flex;
+    justify-content: center;
+    :first-child {
+      justify-content: start;
+    }
+    :last-child {
+      justify-content: start;
+    }
+  }
+  .disabled-row {
+    opacity: 0.3 !important;
+    pointer-events: none;
+    .allow-events {
+      pointer-events: initial;
+    }
   }
   .ant-table-tbody > tr {
     cursor: grab;
   }
-  .ant-table-thead > tr {
-    background: ${(p) => p.theme.colors.gray100};
-  }
-  .ant-table-thead > tr > th:nth-child(1) {
+  .ant-table-thead > tr > th:first-child {
     width: 35px;
     height: 43px;
-    background: ${(p) => p.theme.colors.gray100};
+    padding-right: 2rem;
   }
-  .ant-table-thead > tr > th:nth-child(2) {
-    width: 100%;
-    background: ${(p) => p.theme.colors.gray100};
+  th.ant-table-cell {
+    padding: 10px !important;
+    display: flex;
+    justify-content: center;
+    :last-child {
+      justify-content: center;
+    }
+    :nth-child(2) {
+      justify-content: start;
+    }
   }
-
   tr.dragging {
     background: ${(p) => p.theme.colors.gray100};
   }
@@ -203,13 +290,14 @@ const TableRow = styled.tr`
   border-bottom: 1px solid ${(p) => p.theme.colors.gray200};
   :hover {
     background: ${(p) => p.theme.colors.gray100};
-    cursor: pointer;
   }
 
   button {
     display: none;
     box-shadow: none;
     z-index: 100;
+    position: absolute;
+    right: 0;
   }
 
   :hover {
@@ -225,8 +313,15 @@ const TableRow = styled.tr`
 `;
 
 const FlexEndContainer = styled.div`
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  flex-grow: 1;
   align-items: center;
-  width: 100%;
+  justify-content: end;
+`;
+
+const TextCss = styled.span`
+  color: ${(p) => p.theme.colors.primary500};
+  padding: 10px;
+  cursor: pointer;
 `;

@@ -8,7 +8,6 @@ export async function GET(
   { params }: { params: { id: number } }
 ) {
   const { id } = params;
-  console.log("route module group id", id);
   if (!id) {
     return NextResponse.json(
       { error: "Missing id parameter" },
@@ -21,31 +20,87 @@ export async function GET(
       .from("module_group_spec_module_specs")
       .select("*")
       .eq("module_group_spec_id", id);
-
   if (moduleGroupSpecError) {
     return NextResponse.json(moduleGroupSpecError, { status: 500 });
   }
 
-  const moduleSpecIds = moduleGroupSpecModuleSpecs?.map(
-    (moduleSpec) => moduleSpec.module_spec_id
-  );
-  console.log("moduleSpecIds", moduleSpecIds);
+  return NextResponse.json(moduleGroupSpecModuleSpecs, { status: 200 });
+}
 
-  const { data: moduleGroupSpecs, error: moduleSpecsError } = await supabase
-    .from("module_specs")
-    .select("*")
-    .in("module_spec_id", moduleSpecIds);
-  if (moduleSpecsError) {
-    console.error(
-      "Error fetching module group module specs:",
-      moduleSpecsError
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
+  const { id } = params;
+  const { module_spec_id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
     );
+  }
+  const { data, error } = await supabase
+    .from("module_group_spec_module_specs")
+    .insert([{ module_spec_id, module_group_spec_id: id }]);
 
-    console.log("moduleGroupModuleSpecs", moduleGroupSpecs);
-    return NextResponse.json(moduleSpecsError, { status: 500 });
+  if (error) {
+    return NextResponse.json(error, { status: 500 });
   }
 
-  console.log(moduleGroupSpecs);
+  return NextResponse.json(data, { status: 200 });
+}
 
-  return NextResponse.json(moduleGroupSpecs, { status: 200 });
+//delete route
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
+  const { id } = params;
+
+  console.log("DELETE module group spec", id);
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
+    );
+  }
+  const { data, error } = await supabase
+    .from("module_group_spec_module_specs")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    return NextResponse.json(error, { status: 500 });
+  }
+
+  return NextResponse.json(data, { status: 200 });
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: number } }
+) {
+  const { id } = params;
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Missing id parameter" },
+      { status: 400 }
+    );
+  }
+
+  const body: boolean = await req.json();
+
+  const { data, error } = await supabase
+    .from("module_group_spec_module_specs")
+    .upsert(body, { onConflict: "id" });
+
+  if (error) {
+    console.error("Supabase error:", error);
+    return NextResponse.json(error, { status: 500 });
+  }
+
+  return NextResponse.json(data, { status: 200 });
 }

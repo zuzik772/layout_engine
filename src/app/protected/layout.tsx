@@ -2,13 +2,14 @@
 
 import styled from "styled-components";
 import SideNavigation from "../components/SideNavigation";
-import ModuleGroupProvider from "../providers/ModuleGroupProvider";
+// import ModuleGroupProvider from "../providers/ModuleGroupProvider";
 
 export default function CMSLayout({ children }: { children: React.ReactNode }) {
   return (
     <WrapperCss>
       <SideNavigation />
-      <ModuleGroupProvider>{children}</ModuleGroupProvider>
+      {/* <ModuleGroupProvider>{children}</ModuleGroupProvider> */}
+      {children}
     </WrapperCss>
   );
 }

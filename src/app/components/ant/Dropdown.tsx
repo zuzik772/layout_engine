@@ -1,26 +1,33 @@
 import React from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Dropdown, Space, Typography } from "antd";
-import { ModuleSpec } from "@/app/data/typings";
+import { Button, Dropdown, Space, Typography } from "antd";
+import { usePathname } from "next/navigation";
+import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
+import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 
-const SelectableDropdown = ({
-  moduleSpecs,
-  setModuleSpecs,
-}: {
-  moduleSpecs: ModuleSpec[];
-  setModuleSpecs: any;
-}) => {
-  const items: MenuProps["items"] = moduleSpecs.map((moduleSpec) => ({
-    key: moduleSpec.id.toString(),
-    label: moduleSpec.name,
-  }));
+const SelectableDropdown = () => {
+  const { moduleSpecs } = useModuleSpecs();
+
+  const pathname = usePathname();
+  const id = Number(pathname.split("/")[3]);
+
+  const { addModuleSpec } = useModuleGroupSpecs(id);
+
+  const items: MenuProps["items"] =
+    moduleSpecs &&
+    moduleSpecs.map((moduleSpec) => ({
+      key: moduleSpec.id.toString(),
+      label: moduleSpec.name,
+    }));
 
   const handleSelect: MenuProps["onSelect"] = (e) => {
-    const selectedModuleSpec = moduleSpecs.find(
-      (moduleSpec) => Number(moduleSpec.id) === Number(e.key)
-    );
-    console.log(selectedModuleSpec);
+    const selectedModuleSpec = moduleSpecs && moduleSpecs.find((moduleSpec) => Number(moduleSpec.id) === Number(e.key));
+    if (!selectedModuleSpec) {
+      console.error("Selected module spec not found");
+      return;
+    }
+    addModuleSpec(selectedModuleSpec);
   };
 
   return (
@@ -33,8 +40,9 @@ const SelectableDropdown = ({
       }}
     >
       <Typography.Link>
-        <Space>Add module spec</Space>
-        <DownOutlined />
+        <Button type="primary">
+          Add module spec <DownOutlined />
+        </Button>
       </Typography.Link>
     </Dropdown>
   );

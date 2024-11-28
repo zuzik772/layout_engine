@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Skeleton, Table } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
-import { getModuleGroupSpecs } from "@/app/api/module-group-specs/api";
 import { ModuleSpec } from "@/app/data/typings";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
+import { getModuleGroupSpecs } from "@/app/api/module-group-spec-module-specs/[id]";
 
 interface DataType {
   key: React.Key;
@@ -22,17 +22,23 @@ const columns: TableColumnsType<DataType> = [
 // rowSelection object indicates the need for row selection
 const rowSelection: TableProps<DataType>["rowSelection"] = {
   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      "selectedRows: ",
+      selectedRows
+    );
   },
 };
 
 export const ModuleSpecsTable = () => {
-  const { openDrawer } = useDrawerContext();
+  const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
 
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>([]);
+  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
+    []
+  );
 
   useEffect(() => {
     getModuleGroupSpecs(id).then((data) => {
@@ -43,7 +49,10 @@ export const ModuleSpecsTable = () => {
   if (!selectedModuleSpecs) {
     return <Skeleton active />;
   }
-  const data: DataType[] = selectedModuleSpecs.map((spec) => ({ key: spec.id, name: spec.name }));
+  const data: DataType[] = selectedModuleSpecs.map((spec) => ({
+    key: spec.id,
+    name: spec.name,
+  }));
 
   return (
     <Table<DataType>
@@ -53,7 +62,7 @@ export const ModuleSpecsTable = () => {
       pagination={false}
       sticky
       onRow={(spec) => ({
-        onClick: () => openDrawer(spec.name),
+        onClick: () => showDesktopDrawer(spec.name),
       })}
     />
   );

@@ -91,16 +91,6 @@ function DrawerMobileContent() {
       return;
     }
 
-    // if (selectedSpecId) {
-    //   const updatedConfig = { ...values, spec_id: selectedSpecId };
-    //   setMobileLayoutConfig(updatedConfig);
-    //   addMobileConfiguration(updatedConfig); // Submit the updated config
-    //   messageApi.open({
-    //     type: "success",
-    //     content: "Configuration published successfully!",
-    //   });
-    //   closeDrawer();
-    // }
     const updatedConfig = { ...values, spec_id: selectedSpecId };
 
     try {

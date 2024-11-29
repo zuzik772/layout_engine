@@ -1,6 +1,5 @@
 import { DrawerProps } from "antd";
 import React, { useState, createContext, useContext } from "react";
-import { getMobileConfig } from "../api/mobile-layout-configuration/[id]";
 import { DesktopLayoutConfig, MobileLayoutConfig } from "../data/typings";
 
 type Optional<T> = T | undefined;
@@ -14,8 +13,8 @@ interface DrawerValuesDto {
   selectedSpecId: number;
   selectedSpecName: string;
   size?: DrawerProps["size"];
-  mobileLayoutConfig: MobileLayoutConfig | undefined;
-  desktopLayoutConfig: DesktopLayoutConfig | undefined;
+  mobileLayoutConfig: Optional<MobileLayoutConfig>;
+  desktopLayoutConfig: Optional<DesktopLayoutConfig>;
 }
 
 interface DrawerContextDto extends DrawerValuesDto {
@@ -55,9 +54,6 @@ function DrawerProvider(props: DrawerProviderProps) {
     setSelectedSpecName(name);
     setSize("default");
     setDrawerOpen(true);
-    getMobileConfig(id).then((config) => {
-      setMobileLayoutConfig(config);
-    });
   };
 
   const showDesktopDrawer = (id: number, name: string) => {

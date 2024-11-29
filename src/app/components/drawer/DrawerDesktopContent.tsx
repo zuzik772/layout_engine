@@ -13,8 +13,6 @@ import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
 const DrawerDesktopContent = () => {
   const { selectedSpecId, closeDrawer, drawerState, setDrawerState, desktopLayoutConfig, setDesktopLayoutConfig } = useDrawerContext();
   const { desktopConfig, addDesktopConfiguration, updateDesktopConfiguration, isLoading } = useDesktopLayoutConfig(selectedSpecId);
-  const [isContainer, setIsContainer] = useState(false);
-  const [value, setValue] = useState("");
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const { Option } = Select;
@@ -85,7 +83,7 @@ const DrawerDesktopContent = () => {
       });
   };
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: DesktopLayoutConfig) => {
     console.log("Received values of form: ", values);
     if (!values.title || !values.type) {
       messageApi.open({
@@ -154,7 +152,7 @@ const DrawerDesktopContent = () => {
           />
 
           {/* Equivalent to fillColumns attribute */}
-          <DesktopLayoutConfiguration isContainer={isContainer} title={value} />
+          <DesktopLayoutConfiguration isContainer={form.getFieldValue("boxed")} title={form.getFieldValue("title")} />
         </ContainerCss>
         <Wrapper>
           <Button onClick={closeDrawer}>Cancel</Button>

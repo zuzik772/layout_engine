@@ -4,18 +4,12 @@ import { StyledFormItem } from "../DrawerDesktopContent";
 import LayoutPreview from "./LayoutPreview";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
+import { LayoutConfigurationProps } from "./MobileLayoutConfiguration";
 
-type DesktopLayoutConfigurationProps = {
-  isContainer: boolean;
-  title?: string;
-};
-
-const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigurationProps) => {
+const DesktopLayoutConfiguration = ({ isContainer, title }: LayoutConfigurationProps) => {
   const { selectedSpecId, desktopLayoutConfig, setDesktopLayoutConfig } = useDrawerContext();
-  const { desktopConfig, isLoading } = useDesktopLayoutConfig(selectedSpecId);
-  const [selectedWebColumns, setSelectedWebColumns] = useState<number>(1);
+  const { desktopConfig } = useDesktopLayoutConfig(selectedSpecId);
   const [selectedWebLayout, setSelectedWebLayout] = useState("3/3");
-  const [selectedWebRows, setSelectedWebRows] = useState<number>(1);
   const { Option } = Select;
 
   const selectedDesktopConfig = Array.isArray(desktopConfig) ? desktopConfig[0] : desktopConfig;
@@ -31,7 +25,7 @@ const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigu
       setColumns(selectedDesktopConfig?.columns ?? 1);
       setRows(selectedDesktopConfig?.rows ?? 1);
     }
-  }, [desktopConfig, selectedDesktopConfig, selectedSpecId]);
+  }, [desktopConfig, selectedDesktopConfig, selectedSpecId, setDesktopLayoutConfig]);
 
   const handleColumnsChange = (value: number) => {
     setColumns(value);
@@ -57,11 +51,11 @@ const DesktopLayoutConfiguration = ({ isContainer, title }: DesktopLayoutConfigu
   };
 
   const layoutOptions = [
-    { label: "1/3", value: "1/3" }, //mobile has only 1 column layout
+    { label: "1/3", value: "1/3" },
     { label: "2/3", value: "2/3" },
     { label: "3/3", value: "3/3" },
   ];
-  console.log("number of columns, rows", columns, rows);
+
   return (
     <>
       <Row gutter={16}>

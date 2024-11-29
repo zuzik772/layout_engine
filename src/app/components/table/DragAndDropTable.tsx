@@ -4,6 +4,7 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import {
   DeleteOutlined,
   DesktopOutlined,
+  EditOutlined,
   ExclamationCircleFilled,
   EyeInvisibleOutlined,
   EyeOutlined,
@@ -13,12 +14,16 @@ import {
 import styled from "styled-components";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
-import { ModuleSpec } from "@/app/data/typings";
 import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
 import { useLayoutTypeContext } from "../drawer/layout/LayoutProvider";
+import TableStatusTag from "./StatusTag";
+import { useMobileLayoutConfig } from "@/app/hooks/use-mobile-layout-config";
+import { getMobileConfigIDS } from "@/app/api/mobile-layout-configuration";
+import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
+import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
 
 interface DataType {
   key: string;
@@ -27,7 +32,7 @@ interface DataType {
   disabled: boolean;
 }
 const DraggableTable: React.FC = () => {
-  const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
+  const { showMobileDrawer, showDesktopDrawer, drawerState, selectedSpecId } = useDrawerContext();
   const { setIsMobileLayout } = useLayoutTypeContext();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
@@ -35,6 +40,32 @@ const DraggableTable: React.FC = () => {
   const { isLoading, error, moduleGroupSpecs, deleteModuleSpec, updateModuleSpec } = useModuleGroupSpecs(id);
   const { moduleSpecs } = useModuleSpecs();
   const { specsPositions } = useSpecsPositions(id);
+  const { mobileConfig } = useMobileLayoutConfig(selectedSpecId);
+  const { desktopConfig } = useDesktopLayoutConfig(selectedSpecId);
+  const [mobilePublishedIds, setMobilePublishedIds] = useState<number[]>([]);
+  const [desktopPublishedIds, setDesktopPublishedIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchPublishedIds = async () => {
+      try {
+        const [mobilePublishedIds, desktopPublishedIds] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
+
+        setMobilePublishedIds(mobilePublishedIds?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
+        setDesktopPublishedIds(desktopPublishedIds?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
+
+        const isPublished =
+          selectedSpecId &&
+          (mobilePublishedIds?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId) ||
+            desktopPublishedIds?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId));
+
+        return isPublished ? "published" : "draft";
+      } catch (error) {
+        console.error("Error fetching published IDs:", error);
+      }
+    };
+
+    fetchPublishedIds();
+  }, [mobileConfig, desktopConfig]);
 
   useEffect(() => {
     const initialData: DataType[] =
@@ -106,6 +137,7 @@ const DraggableTable: React.FC = () => {
       updateModuleSpec({ ...moduleSpec, disabled: !record.disabled });
     }
   };
+
   const columns = [
     {
       title: "",
@@ -133,7 +165,27 @@ const DraggableTable: React.FC = () => {
           setIsMobileLayout(true);
         },
       }),
-      render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
+      render: (_: any, __: any, index: number) => (
+        <TextCss>
+          <Space>
+            Edit
+            <EditOutlined />
+          </Space>
+        </TextCss>
+      ),
+    },
+    {
+      title: (
+        <Space>
+          Status <MobileOutlined />
+        </Space>
+      ),
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, record: DataType) => {
+        const isPublished = mobilePublishedIds.includes(Number(record.key ?? 0));
+        return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
+      },
     },
     {
       title: (
@@ -149,7 +201,27 @@ const DraggableTable: React.FC = () => {
           setIsMobileLayout(false);
         },
       }),
-      render: (_: any, __: any, index: number) => <TextCss>edit</TextCss>,
+      render: (_: any, __: any, index: number) => (
+        <TextCss>
+          <Space>
+            Edit
+            <EditOutlined />
+          </Space>
+        </TextCss>
+      ),
+    },
+    {
+      title: (
+        <Space>
+          Status <DesktopOutlined />
+        </Space>
+      ),
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, record: DataType) => {
+        const isPublished = desktopPublishedIds.includes(Number(record.key ?? 0));
+        return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
+      },
     },
     {
       title: "Disabled",
@@ -244,9 +316,6 @@ const StyledTable = styled.div`
     :first-child {
       justify-content: start;
     }
-    :last-child {
-      justify-content: start;
-    }
   }
   .disabled-row {
     opacity: 0.3 !important;
@@ -267,12 +336,13 @@ const StyledTable = styled.div`
     padding: 10px !important;
     display: flex;
     justify-content: center;
-    :last-child {
-      justify-content: center;
+    :not(:nth-child(2)) {
+      flex-shrink: 2;
     }
-    :nth-child(2) {
-      justify-content: start;
-    }
+  }
+  //Name
+  th.ant-table-cell:nth-child(2) {
+    justify-content: start;
   }
   tr.dragging {
     background: ${(p) => p.theme.colors.gray100};
@@ -288,6 +358,11 @@ const StyledTable = styled.div`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid ${(p) => p.theme.colors.gray200};
+
+  td:not(:first-child) {
+    flex-shrink: 2;
+  }
+
   :hover {
     background: ${(p) => p.theme.colors.gray100};
   }

@@ -46,7 +46,6 @@ function DrawerProvider(props: DrawerProviderProps) {
 
   const closeDrawer = () => {
     setDrawerOpen(false);
-    setDrawerState(undefined);
   };
 
   const showMobileDrawer = (id: number, name: string) => {

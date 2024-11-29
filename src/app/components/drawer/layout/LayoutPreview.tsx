@@ -7,11 +7,11 @@ interface LayoutPreviewProps {
   selectedLayout?: string;
   numberOfColumns: number;
   numberOfRows: number;
-  isMobileContainer: boolean;
+  isContainer: boolean;
   title?: string;
 }
 
-const LayoutPreview = ({ selectedLayout, numberOfColumns, numberOfRows, isMobileContainer, title }: LayoutPreviewProps) => {
+const LayoutPreview = ({ selectedLayout, numberOfColumns, numberOfRows, isContainer, title }: LayoutPreviewProps) => {
   // Determines the span width based on the selected layout (1/3, 2/3, 3/3)
   const getLayoutSpan = () => {
     switch (selectedLayout) {
@@ -31,7 +31,7 @@ const LayoutPreview = ({ selectedLayout, numberOfColumns, numberOfRows, isMobile
         <StyledFormItem label={"Layout Preview"}>
           <WrapperCss>
             {selectedLayout && (
-              <LayoutPreviewCss selectedLayout={selectedLayout} span={getLayoutSpan()} isMobileContainer={isMobileContainer}>
+              <LayoutPreviewCss selectedLayout={selectedLayout} span={getLayoutSpan()} isContainer={isContainer}>
                 <TitlePreview>{title}</TitlePreview>
                 {/* Nested Grid for Columns and Rows */}
                 <InternalGrid numberOfColumns={numberOfColumns} numberOfRows={numberOfRows}>
@@ -56,7 +56,7 @@ export default LayoutPreview;
 export const LayoutPreviewCss = styled.div<{
   selectedLayout: string;
   span: number;
-  isMobileContainer: boolean;
+  isContainer: boolean;
 }>`
   min-height: 50px;
   height: 100%;
@@ -65,9 +65,9 @@ export const LayoutPreviewCss = styled.div<{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: ${({ isMobileContainer }) => (isMobileContainer ? " 1px solid #b4b4b4;" : "none")};
+  border: ${({ isContainer }) => (isContainer ? " 1px solid #b4b4b4;" : "none")};
   padding: 12px;
-  background-color: ${({ isMobileContainer }) => (isMobileContainer ? "#f0f0f0" : "transparent")};
+  background-color: ${({ isContainer }) => (isContainer ? "#f0f0f0" : "transparent")};
   p {
     place-self: start;
     padding-bottom: 12px;

@@ -1,6 +1,6 @@
 import { DrawerProps } from "antd";
 import React, { useState, createContext, useContext } from "react";
-import { getMobileConfig } from "../api/mobile-layout-configuration/[id]";
+import { DesktopLayoutConfig, MobileLayoutConfig } from "../data/typings";
 
 type Optional<T> = T | undefined;
 
@@ -13,7 +13,8 @@ interface DrawerValuesDto {
   selectedSpecId: number;
   selectedSpecName: string;
   size?: DrawerProps["size"];
-  mobileLayoutConfig: MobileLayoutConfig | undefined;
+  mobileLayoutConfig: Optional<MobileLayoutConfig>;
+  desktopLayoutConfig: Optional<DesktopLayoutConfig>;
 }
 
 interface DrawerContextDto extends DrawerValuesDto {
@@ -23,6 +24,7 @@ interface DrawerContextDto extends DrawerValuesDto {
   showDesktopDrawer: (id: number, name: string) => void;
   closeDrawer: () => void;
   setMobileLayoutConfig: (config: Optional<MobileLayoutConfig>) => void;
+  setDesktopLayoutConfig: (config: Optional<DesktopLayoutConfig>) => void;
 }
 
 const DrawerContext = createContext<DrawerContextDto>({} as DrawerContextDto);
@@ -30,15 +32,6 @@ const DrawerContext = createContext<DrawerContextDto>({} as DrawerContextDto);
 interface DrawerProviderProps {
   stayClosed?: boolean;
   children: React.ReactNode;
-}
-
-export interface MobileLayoutConfig {
-  spec_id: number;
-  title?: string;
-  type?: string;
-  columns?: number;
-  rows?: number;
-  boxed?: boolean;
 }
 
 function DrawerProvider(props: DrawerProviderProps) {
@@ -49,6 +42,7 @@ function DrawerProvider(props: DrawerProviderProps) {
   const [selectedSpecId, setSelectedSpecId] = useState<number>(0);
   const [selectedSpecName, setSelectedSpecName] = useState<string>("");
   const [mobileLayoutConfig, setMobileLayoutConfig] = useState<MobileLayoutConfig>();
+  const [desktopLayoutConfig, setDesktopLayoutConfig] = useState<DesktopLayoutConfig>();
 
   const closeDrawer = () => {
     setDrawerOpen(false);
@@ -60,9 +54,6 @@ function DrawerProvider(props: DrawerProviderProps) {
     setSelectedSpecName(name);
     setSize("default");
     setDrawerOpen(true);
-    getMobileConfig(id).then((config) => {
-      setMobileLayoutConfig(config);
-    });
   };
 
   const showDesktopDrawer = (id: number, name: string) => {
@@ -88,6 +79,8 @@ function DrawerProvider(props: DrawerProviderProps) {
         selectedSpecName,
         mobileLayoutConfig,
         setMobileLayoutConfig,
+        desktopLayoutConfig,
+        setDesktopLayoutConfig,
       }}
     >
       {props.children}

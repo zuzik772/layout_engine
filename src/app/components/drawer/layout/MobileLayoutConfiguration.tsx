@@ -5,12 +5,12 @@ import { GridCell, InternalGrid, LayoutPreviewCss, TitlePreview, WrapperCss } fr
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { useMobileLayoutConfig } from "@/app/hooks/use-mobile-layout-config";
 
-type MobileLayoutConfigurationProps = {
-  isMobileContainer: boolean;
+export type LayoutConfigurationProps = {
+  isContainer: boolean;
   title?: string;
 };
 
-const MobileLayoutConfiguration = ({ isMobileContainer, title }: MobileLayoutConfigurationProps) => {
+const MobileLayoutConfiguration = ({ isContainer, title }: LayoutConfigurationProps) => {
   const { selectedSpecId, mobileLayoutConfig, setMobileLayoutConfig } = useDrawerContext();
   const { mobileConfig, isLoading } = useMobileLayoutConfig(selectedSpecId);
   const selectedMobileConfig = Array.isArray(mobileConfig) ? mobileConfig[0] : mobileConfig;
@@ -27,7 +27,7 @@ const MobileLayoutConfiguration = ({ isMobileContainer, title }: MobileLayoutCon
       setColumns(selectedMobileConfig?.columns ?? 1);
       setRows(selectedMobileConfig?.rows ?? 1);
     }
-  }, [mobileConfig, selectedMobileConfig, selectedSpecId]);
+  }, [mobileConfig, selectedMobileConfig, selectedSpecId, setMobileLayoutConfig]);
 
   const handleColumnsChange = (value: number) => {
     setColumns(value);
@@ -81,15 +81,12 @@ const MobileLayoutConfiguration = ({ isMobileContainer, title }: MobileLayoutCon
 
           <StyledFormItem label={"Layout Preview"}>
             <WrapperCss>
-              <LayoutPreviewCss selectedLayout="3/3" span={24} isMobileContainer={isMobileContainer}>
+              <LayoutPreviewCss selectedLayout="3/3" span={24} isContainer={isContainer}>
                 <TitlePreview>{title}</TitlePreview>
                 {/* Nested Grid for Columns and Rows */}
                 <InternalGrid numberOfColumns={columns} numberOfRows={rows}>
                   {Array.from({ length: columns * rows }).map((_, index) => (
-                    <GridCell key={index}>
-                      {/* C{Math.floor(index / numberOfColumns) + 1}R
-                      {(index % numberOfRows) + 1} */}
-                    </GridCell>
+                    <GridCell key={index} />
                   ))}
                 </InternalGrid>
               </LayoutPreviewCss>

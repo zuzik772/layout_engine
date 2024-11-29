@@ -67,3 +67,7 @@ export type MobileLayoutConfig = {
   rows?: number;
   boxed?: boolean;
 };
+
+export interface DesktopLayoutConfig extends MobileLayoutConfig {
+  layout_option?: string;
+}

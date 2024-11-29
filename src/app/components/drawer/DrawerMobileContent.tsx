@@ -91,16 +91,6 @@ function DrawerMobileContent() {
       return;
     }
 
-    // if (selectedSpecId) {
-    //   const updatedConfig = { ...values, spec_id: selectedSpecId };
-    //   setMobileLayoutConfig(updatedConfig);
-    //   addMobileConfiguration(updatedConfig); // Submit the updated config
-    //   messageApi.open({
-    //     type: "success",
-    //     content: "Configuration published successfully!",
-    //   });
-    //   closeDrawer();
-    // }
     const updatedConfig = { ...values, spec_id: selectedSpecId };
 
     try {
@@ -155,7 +145,7 @@ function DrawerMobileContent() {
             onChange={handleContainerChange}
           />
           {/* Equivalent to fillColumns attribute */}
-          <MobileLayoutConfiguration isMobileContainer={form.getFieldValue("boxed")} title={form.getFieldValue("title")} />
+          <MobileLayoutConfiguration isContainer={form.getFieldValue("boxed")} title={form.getFieldValue("title")} />
         </ContainerCss>
         <Wrapper>
           <Button onClick={closeDrawer}>Cancel</Button>
@@ -170,7 +160,7 @@ function DrawerMobileContent() {
 
 export default DrawerMobileContent;
 
-const Wrapper = styled(Space)`
+export const Wrapper = styled(Space)`
   position: absolute;
   bottom: 0;
   right: 0;
@@ -182,6 +172,6 @@ const Wrapper = styled(Space)`
   background: white;
 `;
 
-const ContainerCss = styled.div`
+export const ContainerCss = styled.div`
   padding-bottom: 40px;
 `;

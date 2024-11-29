@@ -351,7 +351,6 @@ const StyledTable = styled.div`
   tr {
     display: flex;
     align-items: center;
-
     flex-grow: 1;
   }
 `;
@@ -361,6 +360,7 @@ const TableRow = styled.tr`
 
   td:not(:first-child) {
     flex-shrink: 2;
+    min-width: 85px;
   }
 
   :hover {

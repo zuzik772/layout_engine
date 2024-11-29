@@ -24,7 +24,6 @@ const TagCss = styled.span<CssProps>`
   font-size: 12px;
   font-weight: 600;
   border-radius: 20px;
-  background: #f2f0f0;
 
   ${(p) => p.variant === "published" && publishedCss}
   ${(p) => p.variant === "draft" && draftCss}

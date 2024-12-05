@@ -9,9 +9,10 @@ import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
 import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
 
 const SelectableLivePreview = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [previewMode, setPreviewMode] = useState<"mobile" | "desktop" | null>(null);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null); // mobile or desktop
+  const [modalState, setModalState] = useState({
+    isModalOpen: false,
+    previewMode: null as "mobile" | "desktop" | null,
+  });
 
   const items: MenuProps["items"] = [
     { key: "mobile", label: "Mobile Preview" },
@@ -19,19 +20,17 @@ const SelectableLivePreview = () => {
   ];
 
   const handleSelect: MenuProps["onSelect"] = (e) => {
-    setSelectedKey(e.key);
+    setModalState({
+      isModalOpen: true,
+      previewMode: e.key as "mobile" | "desktop",
+    });
   };
 
-  useEffect(() => {
-    if (selectedKey) {
-      setPreviewMode(selectedKey as "mobile" | "desktop");
-      setIsModalOpen(true);
-    }
-  }, [selectedKey]);
-
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedKey(null);
+    setModalState({
+      isModalOpen: false,
+      previewMode: null,
+    });
   };
 
   return (
@@ -50,7 +49,9 @@ const SelectableLivePreview = () => {
           </Button>
         </Typography.Link>
       </Dropdown>
-      {isModalOpen && <ModalContent isModalOpen={isModalOpen} setIsModalOpen={handleCloseModal} previewMode={previewMode} />}
+      {modalState.isModalOpen && (
+        <ModalContent isModalOpen={modalState.isModalOpen} setIsModalOpen={handleCloseModal} previewMode={modalState.previewMode} />
+      )}
     </>
   );
 };
@@ -68,21 +69,24 @@ const ModalContent = ({
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedPreview, setSelectedPreview] = useState<MobileLayoutConfig | DesktopLayoutConfig | null | undefined>();
+
   useEffect(() => {
     const fetchPublishedLayout = async () => {
       try {
         const [mobileData, desktopData] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
         setIsLoading(false);
-        const data = previewMode === "mobile" ? setSelectedPreview(mobileData) : setSelectedPreview(desktopData);
-        return data;
+        const data = previewMode === "mobile" ? mobileData : desktopData;
+        setSelectedPreview(data);
       } catch (error) {
         console.error("Error fetching published IDs:", error);
         setIsLoading(false);
       }
     };
-    setIsLoading(true);
-    fetchPublishedLayout();
-  }, []);
+    if (previewMode) {
+      setIsLoading(true);
+      fetchPublishedLayout();
+    }
+  }, [previewMode]);
 
   return (
     <ModalCss
@@ -99,8 +103,11 @@ const ModalContent = ({
         },
       }}
     >
-      {isLoading && <Skeleton active />}
-      <ContainerCss previewMode={previewMode}>{selectedPreview && <LivePreview layoutConfig={selectedPreview} />}</ContainerCss>
+      {isLoading ? (
+        <Skeleton active />
+      ) : (
+        <ContainerCss previewMode={previewMode}>{selectedPreview && <LivePreview layoutConfig={selectedPreview} />}</ContainerCss>
+      )}
     </ModalCss>
   );
 };

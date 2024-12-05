@@ -23,15 +23,12 @@ const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | Desk
   return (
     <WrapperCss>
       <Row gutter={[16, 16]}>
-        {/* Render dynamic columns with nested grids */}
         {layoutConfig.map((item, index) => {
           const span = getLayoutSpan(item.layout_option ?? "3/3");
-          const isContainer = item.boxed;
-
           return (
             <Col span={span} key={index}>
-              <LivePreviewCss isContainer={isContainer}>
-                {item.title && <TitlePreview>{item.title}</TitlePreview>}
+              <LivePreviewCss isContainer={item.boxed}>
+                <TitlePreview>{item.title}</TitlePreview>
                 <NestedGrid numberOfColumns={item.columns} numberOfRows={item.rows}>
                   {Array.from({ length: item.columns * item.rows }).map((_, index) => (
                     <GridCell key={index} />

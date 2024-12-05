@@ -22,29 +22,23 @@ const columns: TableColumnsType<DataType> = [
 // rowSelection object indicates the need for row selection
 const rowSelection: TableProps<DataType>["rowSelection"] = {
   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    console.log(
-      `selectedRowKeys: ${selectedRowKeys}`,
-      "selectedRows: ",
-      selectedRows
-    );
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
   },
 };
 
 export const ModuleSpecsTable = () => {
-  const { showMobileDrawer, showDesktopDrawer } = useDrawerContext();
+  const { showDesktopDrawer } = useDrawerContext();
 
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
 
-  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>(
-    []
-  );
+  const [selectedModuleSpecs, setSelectedModuleSpecs] = useState<ModuleSpec[]>([]);
 
   useEffect(() => {
     getModuleGroupSpecs(id).then((data) => {
       setSelectedModuleSpecs(data);
     });
-  }, []);
+  }, [id]);
 
   if (!selectedModuleSpecs) {
     return <Skeleton active />;
@@ -62,7 +56,7 @@ export const ModuleSpecsTable = () => {
       pagination={false}
       sticky
       onRow={(spec) => ({
-        onClick: () => showDesktopDrawer(spec.name),
+        onClick: () => showDesktopDrawer(Number(spec.key), spec.name),
       })}
     />
   );

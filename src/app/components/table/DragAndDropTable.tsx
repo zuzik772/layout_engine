@@ -65,7 +65,7 @@ const DraggableTable: React.FC = () => {
     };
 
     fetchPublishedIds();
-  }, [mobileConfig, desktopConfig]);
+  }, [mobileConfig, desktopConfig, selectedSpecId]);
 
   useEffect(() => {
     const initialData: DataType[] =

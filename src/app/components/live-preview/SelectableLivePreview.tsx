@@ -90,10 +90,10 @@ const ModalContent = ({
         if (moduleGroupSpecs) {
           const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
           const previewDataIds = data.map((item) => item.spec_id);
-          const matchingIds = moduleGroupSpecIds.filter((id) => previewDataIds.includes(id));
-          setPublishedIds(matchingIds);
-          const matchedData = data.filter((item) => matchingIds.includes(item.spec_id));
-          setSelectedPreview(matchedData);
+          const matchingPreviewIds = moduleGroupSpecIds.filter((id) => previewDataIds.includes(id));
+          setPublishedIds(matchingPreviewIds);
+          const matchedPreviewData = data.filter((item) => matchingPreviewIds.includes(item.spec_id));
+          setSelectedPreview(matchedPreviewData);
         }
       } catch (error) {
         console.error("Error fetching published IDs:", error);
@@ -121,11 +121,9 @@ const ModalContent = ({
         },
       }}
     >
-      {isLoading ? (
-        <Skeleton active />
-      ) : (
-        <ContainerCss previewMode={previewMode}>{selectedPreview && <LivePreview layoutConfig={selectedPreview} />}</ContainerCss>
-      )}
+      <ContainerCss previewMode={previewMode}>
+        {isLoading ? <Skeleton active /> : selectedPreview && <LivePreview layoutConfig={selectedPreview} />}
+      </ContainerCss>
     </ModalCss>
   );
 };

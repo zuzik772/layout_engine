@@ -44,7 +44,7 @@ const DraggableTable: React.FC = () => {
   const { desktopConfig } = useDesktopLayoutConfig(selectedSpecId);
   const [mobilePublishedLayout, setMobilePublishedLayout] = useState<number[]>([]);
   const [desktopPublishedLayout, setDesktopPublishedLayout] = useState<number[]>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchPublishedLayout = async () => {
       try {
@@ -56,10 +56,11 @@ const DraggableTable: React.FC = () => {
           selectedSpecId &&
           (mobilePublishedLayout?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId) ||
             desktopPublishedLayout?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId));
-
+        setLoading(false);
         return isPublished ? "published" : "draft";
       } catch (error) {
         console.error("Error fetching published IDs:", error);
+        setLoading(false);
       }
     };
 
@@ -136,6 +137,13 @@ const DraggableTable: React.FC = () => {
       updateModuleSpec({ ...moduleSpec, disabled: !record.disabled });
     }
   };
+  const renderStatusTag = (loading: boolean, publishedLayout: number[], record: DataType) => {
+    if (loading) {
+      return <Skeleton.Button active style={{ height: 20 }} />;
+    }
+    const isPublished = publishedLayout.includes(Number(record.key ?? 0));
+    return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
+  };
 
   const columns = [
     {
@@ -182,10 +190,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "status",
       key: "status",
-      render: (_: any, record: DataType) => {
-        const isPublished = mobilePublishedLayout.includes(Number(record.key ?? 0));
-        return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
-      },
+      render: (_: any, record: DataType) => renderStatusTag(loading, mobilePublishedLayout, record),
     },
     {
       title: (
@@ -219,10 +224,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "status",
       key: "status",
-      render: (_: any, record: DataType) => {
-        const isPublished = desktopPublishedLayout.includes(Number(record.key ?? 0));
-        return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
-      },
+      render: (_: any, record: DataType) => renderStatusTag(loading, mobilePublishedLayout, record),
     },
     {
       title: "Disabled",

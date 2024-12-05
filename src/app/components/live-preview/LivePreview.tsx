@@ -1,30 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import { Row, Col } from "antd";
+import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
 
-interface LivePreviewProps {
-  layout: Array<{
-    selectableLayout: string;
-    numberOfColumns: number;
-    numberOfRows: number;
-    title: string;
-    isContainer: boolean;
-  }>;
-}
+const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | DesktopLayoutConfig }) => {
+  if (!Array.isArray(layoutConfig)) {
+    return null;
+  }
 
-const LivePreview = ({ layout }: LivePreviewProps) => {
-  const renderNestedGrid = (numCols: number, numRows: number) => (
-    <NestedGrid numberOfColumns={numCols} numberOfRows={numRows}>
-      {Array.from({ length: numCols * numRows }).map((_, index) => (
-        <GridCell key={index}>
-          C{Math.floor(index / numCols) + 1}R{(index % numCols) + 1}
-        </GridCell>
-      ))}
-    </NestedGrid>
-  );
-
-  const getLayoutSpan = (layout: string) => {
-    switch (layout) {
+  const getLayoutSpan = (layout_option: string) => {
+    switch (layout_option) {
       case "1/3":
         return 8; // 1/3 of a 24-column grid
       case "2/3":
@@ -39,15 +24,19 @@ const LivePreview = ({ layout }: LivePreviewProps) => {
     <WrapperCss>
       <Row gutter={[16, 16]}>
         {/* Render dynamic columns with nested grids */}
-        {layout.map((item, index) => {
-          const span = getLayoutSpan(item.selectableLayout);
-          const isContainer = item.isContainer;
+        {layoutConfig.map((item, index) => {
+          const span = getLayoutSpan(item.layout_option ?? "3/3");
+          const isContainer = item.boxed;
 
           return (
             <Col span={span} key={index}>
               <LivePreviewCss isContainer={isContainer}>
                 {item.title && <TitlePreview>{item.title}</TitlePreview>}
-                {renderNestedGrid(item.numberOfColumns, item.numberOfRows)}
+                <NestedGrid numberOfColumns={item.columns} numberOfRows={item.rows}>
+                  {Array.from({ length: item.columns * item.rows }).map((_, index) => (
+                    <GridCell key={index} />
+                  ))}
+                </NestedGrid>
               </LivePreviewCss>
             </Col>
           );

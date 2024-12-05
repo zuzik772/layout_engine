@@ -42,21 +42,20 @@ const DraggableTable: React.FC = () => {
   const { specsPositions } = useSpecsPositions(id);
   const { mobileConfig } = useMobileLayoutConfig(selectedSpecId);
   const { desktopConfig } = useDesktopLayoutConfig(selectedSpecId);
-  const [mobilePublishedIds, setMobilePublishedIds] = useState<number[]>([]);
-  const [desktopPublishedIds, setDesktopPublishedIds] = useState<number[]>([]);
+  const [mobilePublishedLayout, setMobilePublishedLayout] = useState<number[]>([]);
+  const [desktopPublishedLayout, setDesktopPublishedLayout] = useState<number[]>([]);
 
   useEffect(() => {
-    const fetchPublishedIds = async () => {
+    const fetchPublishedLayout = async () => {
       try {
-        const [mobilePublishedIds, desktopPublishedIds] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
-
-        setMobilePublishedIds(mobilePublishedIds?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
-        setDesktopPublishedIds(desktopPublishedIds?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
+        const [mobilePublishedLayout, desktopPublishedLayout] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
+        setMobilePublishedLayout(mobilePublishedLayout?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
+        setDesktopPublishedLayout(desktopPublishedLayout?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
 
         const isPublished =
           selectedSpecId &&
-          (mobilePublishedIds?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId) ||
-            desktopPublishedIds?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId));
+          (mobilePublishedLayout?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId) ||
+            desktopPublishedLayout?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId));
 
         return isPublished ? "published" : "draft";
       } catch (error) {
@@ -64,7 +63,7 @@ const DraggableTable: React.FC = () => {
       }
     };
 
-    fetchPublishedIds();
+    fetchPublishedLayout();
   }, [mobileConfig, desktopConfig, selectedSpecId]);
 
   useEffect(() => {
@@ -184,7 +183,7 @@ const DraggableTable: React.FC = () => {
       dataIndex: "status",
       key: "status",
       render: (_: any, record: DataType) => {
-        const isPublished = mobilePublishedIds.includes(Number(record.key ?? 0));
+        const isPublished = mobilePublishedLayout.includes(Number(record.key ?? 0));
         return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
       },
     },
@@ -221,7 +220,7 @@ const DraggableTable: React.FC = () => {
       dataIndex: "status",
       key: "status",
       render: (_: any, record: DataType) => {
-        const isPublished = desktopPublishedIds.includes(Number(record.key ?? 0));
+        const isPublished = desktopPublishedLayout.includes(Number(record.key ?? 0));
         return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
       },
     },

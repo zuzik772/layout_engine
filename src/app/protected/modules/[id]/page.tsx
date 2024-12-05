@@ -10,7 +10,7 @@ import { Button } from "antd";
 import AntDrawer from "@/app/components/drawer/AntDrawer";
 import LayoutTypeProvider from "@/app/components/drawer/layout/LayoutProvider";
 import SelectableMobileSpec from "@/app/components/dropdown/SelectableModuleSpec";
-import SelectableLivePreview from "@/app/components/dropdown/SelectableLivePreview";
+import SelectableLivePreview from "@/app/components/live-preview/SelectableLivePreview";
 
 export default function ModuleSpecsPage() {
   const pathname = usePathname();

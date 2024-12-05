@@ -159,6 +159,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "mobile",
       key: "mobile",
+      className: "min-width",
       onCell: (record: DataType) => ({
         onClick: () => {
           showMobileDrawer(Number(record.key), record.name);
@@ -195,6 +196,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "desktop",
       key: "desktop",
+      className: "min-width",
       onCell: (record: DataType) => ({
         onClick: () => {
           showDesktopDrawer(Number(record.key), record.name);
@@ -366,7 +368,10 @@ const TableRow = styled.tr`
   :hover {
     background: ${(p) => p.theme.colors.gray100};
   }
-
+  .min-width > span {
+    min-width: 85px;
+    text-align: center;
+  }
   button {
     display: none;
     box-shadow: none;

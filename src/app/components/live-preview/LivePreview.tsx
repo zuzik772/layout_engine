@@ -3,11 +3,11 @@ import styled from "styled-components";
 import { Row, Col } from "antd";
 import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
 
-const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | DesktopLayoutConfig }) => {
+const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig[] | DesktopLayoutConfig[] }) => {
   if (!Array.isArray(layoutConfig)) {
     return null;
   }
-
+  console.log(layoutConfig);
   const getLayoutSpan = (layout_option: string) => {
     switch (layout_option) {
       case "1/3":
@@ -19,18 +19,21 @@ const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | Desk
         return 24; // Full width
     }
   };
-
+  const isDesktopLayoutConfig = (item: any): item is DesktopLayoutConfig => {
+    return (item as DesktopLayoutConfig).layout_option !== undefined;
+  };
   return (
     <WrapperCss>
       <Row gutter={[16, 16]}>
         {layoutConfig.map((item, index) => {
-          const span = getLayoutSpan(item.layout_option ?? "3/3");
+          const span = isDesktopLayoutConfig(item) ? getLayoutSpan(item.layout_option ?? "3/3") : 24;
+
           return (
             <Col span={span} key={index}>
-              <LivePreviewCss isContainer={item.boxed}>
+              <LivePreviewCss isContainer={item.boxed ?? false}>
                 <TitlePreview>{item.title}</TitlePreview>
-                <NestedGrid numberOfColumns={item.columns} numberOfRows={item.rows}>
-                  {Array.from({ length: item.columns * item.rows }).map((_, index) => (
+                <NestedGrid numberOfColumns={item.columns ?? 1} numberOfRows={item.rows ?? 1}>
+                  {Array.from({ length: item.columns ?? 1 * (item.rows ?? 1) }).map((_, index) => (
                     <GridCell key={index} />
                   ))}
                 </NestedGrid>

@@ -7,6 +7,8 @@ import LivePreview from "./LivePreview";
 import { getMobileConfigIDS } from "@/app/api/mobile-layout-configuration";
 import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
 import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
+import { usePathname } from "next/navigation";
+import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 
 const SelectableLivePreview = () => {
   const [modalState, setModalState] = useState({
@@ -67,16 +69,32 @@ const ModalContent = ({
   setIsModalOpen: () => void;
   previewMode: "mobile" | "desktop" | null;
 }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedPreview, setSelectedPreview] = useState<MobileLayoutConfig | DesktopLayoutConfig | null | undefined>();
+  const pathname = usePathname();
+  const id = Number(pathname.split("/")[3]);
+  const { moduleGroupSpecs } = useModuleGroupSpecs(id);
+  console.log(moduleGroupSpecs);
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedPreview, setSelectedPreview] = useState<MobileLayoutConfig[] | DesktopLayoutConfig[]>();
+  const [publishedIds, setPublishedIds] = useState<number[]>([]);
   useEffect(() => {
     const fetchPublishedLayout = async () => {
       try {
-        const [mobileData, desktopData] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
+        const [mobileData, desktopData]: [MobileLayoutConfig[], DesktopLayoutConfig[]] = await Promise.all([
+          getMobileConfigIDS(),
+          getDesktopConfigIDS(),
+        ]);
         setIsLoading(false);
         const data = previewMode === "mobile" ? mobileData : desktopData;
-        setSelectedPreview(data);
+
+        if (moduleGroupSpecs) {
+          const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
+          const previewDataIds = data.map((item) => item.spec_id);
+          const matchingIds = moduleGroupSpecIds.filter((id) => previewDataIds.includes(id));
+          setPublishedIds(matchingIds);
+          const matchedData = data.filter((item) => matchingIds.includes(item.spec_id));
+          setSelectedPreview(matchedData);
+        }
       } catch (error) {
         console.error("Error fetching published IDs:", error);
         setIsLoading(false);

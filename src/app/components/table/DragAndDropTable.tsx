@@ -19,11 +19,12 @@ import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
 import { useLayoutTypeContext } from "../drawer/layout/LayoutProvider";
-import TableStatusTag from "./StatusTag";
+import TableStatusTag, { TagCss } from "./StatusTag";
 import { useMobileLayoutConfig } from "@/app/hooks/use-mobile-layout-config";
 import { getMobileConfigIDS } from "@/app/api/mobile-layout-configuration";
 import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
 import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
+import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
 
 interface DataType {
   key: string;
@@ -45,6 +46,8 @@ const DraggableTable: React.FC = () => {
   const [mobilePublishedLayout, setMobilePublishedLayout] = useState<number[]>([]);
   const [desktopPublishedLayout, setDesktopPublishedLayout] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileTitles, setMobileTitles] = useState<Array<string | undefined>>([]);
+  const [desktopTitles, setDesktopTitles] = useState<Array<string | undefined>>([]);
   useEffect(() => {
     const fetchPublishedLayout = async () => {
       try {
@@ -66,6 +69,37 @@ const DraggableTable: React.FC = () => {
 
     fetchPublishedLayout();
   }, [mobileConfig, desktopConfig, selectedSpecId]);
+  //review this
+  useEffect(() => {
+    const fetchPublishedLayout = async () => {
+      try {
+        const [mobileData, desktopData]: [MobileLayoutConfig[], DesktopLayoutConfig[]] = await Promise.all([
+          getMobileConfigIDS(),
+          getDesktopConfigIDS(),
+        ]);
+        console.log("heeey", mobileData, desktopData);
+        if (moduleGroupSpecs) {
+          const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
+          console.log("moduleGroupSpecIds", moduleGroupSpecIds);
+          const mobileIds = mobileData.map((item) => item.spec_id);
+          console.log("mobileIds", mobileIds);
+          const desktopIds = desktopData.map((item) => item.spec_id);
+          const matchingMobileIds = moduleGroupSpecIds.filter((id) => mobileIds.includes(id));
+          const matchingMobileTitles = mobileData.filter((item) => matchingMobileIds.includes(item.spec_id)).map((item) => item.title);
+          console.log("matchingMobileTitles", matchingMobileTitles);
+          const matchingDesktopIds = moduleGroupSpecIds.filter((id) => desktopIds.includes(id));
+          console.log("matchingMobileIds", matchingMobileIds);
+          const matchingDesktopTitles = desktopData.filter((item) => matchingDesktopIds.includes(item.spec_id)).map((item) => item.title);
+          console.log("matchingDesktopTitles", matchingDesktopTitles);
+          setMobileTitles(matchingMobileTitles);
+          setDesktopTitles(matchingDesktopTitles);
+        }
+      } catch (error) {
+        console.error("Error fetching published IDs:", error);
+      }
+    };
+    fetchPublishedLayout();
+  }, []);
 
   useEffect(() => {
     const initialData: DataType[] =
@@ -159,6 +193,15 @@ const DraggableTable: React.FC = () => {
       key: "name",
     },
     {
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      render: (_: any, __: any, index: number) => {
+        const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
+        return isPublished ? <TitlePreview>{mobileTitles[0]}</TitlePreview> : null;
+      },
+    },
+    {
       title: (
         <Space>
           Mobile <MobileOutlined />
@@ -224,7 +267,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "status",
       key: "status",
-      render: (_: any, record: DataType) => renderStatusTag(loading, mobilePublishedLayout, record),
+      render: (_: any, record: DataType) => renderStatusTag(loading, desktopPublishedLayout, record),
     },
     {
       title: "Disabled",
@@ -405,4 +448,8 @@ const TextCss = styled.span`
   color: ${(p) => p.theme.colors.primary500};
   padding: 10px;
   cursor: pointer;
+`;
+
+const TitlePreview = styled.p`
+  text-overflow: ellipsis;
 `;

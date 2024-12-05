@@ -88,7 +88,7 @@ const ModalContent = ({
         const data = previewMode === "mobile" ? mobileData : desktopData;
 
         if (moduleGroupSpecs) {
-          const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
+          const moduleGroupSpecIds = moduleGroupSpecs.filter((spec) => !spec.disabled).map((spec) => Number(spec.id));
           const previewDataIds = data.map((item) => item.spec_id);
           const matchingPreviewIds = moduleGroupSpecIds.filter((id) => previewDataIds.includes(id));
           setPublishedIds(matchingPreviewIds);

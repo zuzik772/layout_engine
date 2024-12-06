@@ -4,7 +4,7 @@ import type { TableColumnsType, TableProps } from "antd";
 import { ModuleSpec } from "@/app/data/typings";
 import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { usePathname } from "next/navigation";
-import { getModuleGroupSpecs } from "@/app/api/module-group-spec-module-specs/[id]";
+import { getModuleGroupSpecs } from "@/app/api/module-group-specs/[id]";
 
 interface DataType {
   key: React.Key;

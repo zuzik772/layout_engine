@@ -5,7 +5,7 @@ const supabase = createClient();
 
 export async function GET() {
   console.log("route module groups");
-  const { data: moduleGroups, error } = await supabase.from("module_group_specs").select("*");
+  const { data: moduleGroups, error } = await supabase.from("module_groups").select("*");
   if (error) return NextResponse.json(error, { status: 500 });
   return NextResponse.json(moduleGroups, { status: 200 });
 }

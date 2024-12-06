@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Skeleton, Space, Table } from "antd";
+import { Button, Empty, Modal, Skeleton, Space, Table } from "antd";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import {
   DeleteOutlined,
@@ -102,7 +102,7 @@ const DraggableTable: React.FC = () => {
     const initialData: DataType[] =
       moduleGroupSpecs?.map((spec) => {
         const moduleSpec = moduleSpecs?.find((s) => s.module_spec_id === spec.module_spec_id);
-        const currentPosition = specsPositions?.find((pos) => pos.module_group_spec_module_specs_id === Number(spec.id))?.current_position;
+        const currentPosition = specsPositions?.find((pos) => pos.module_group_specs_id === Number(spec.id))?.current_position;
         return {
           key: spec.id,
           name: moduleSpec?.name || "",
@@ -120,7 +120,7 @@ const DraggableTable: React.FC = () => {
   const [data, setData] = useState<DataType[]>([]);
 
   if (isLoading) return isLoading && <Skeleton active />;
-  if (error) return <div>Failed to load module specs</div>;
+  if (error) return <Empty description="Failed to load module specs" />;
 
   const { confirm } = Modal;
   const showDeleteConfirm = (spec: DataType) => {
@@ -152,8 +152,8 @@ const DraggableTable: React.FC = () => {
 
     // Prepare the payload for the API call
     const payload = updatedData.map((item, index) => ({
-      module_group_spec_module_specs_id: Number(item.key),
-      module_group_spec_id: id,
+      module_group_specs_id: Number(item.key),
+      module_groups_id: id,
       current_position: index,
     }));
     console.log("payload", payload);

@@ -27,6 +27,7 @@ const SelectableMobileSpec = () => {
       console.error("Selected module spec not found");
       return;
     }
+    addModuleSpec(selectedModuleSpec);
   };
 
   return (

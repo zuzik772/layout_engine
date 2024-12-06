@@ -99,22 +99,32 @@ const DraggableTable: React.FC = () => {
   }, [moduleGroupSpecs]);
 
   useEffect(() => {
+    if (!specsPositions) return;
+
+    // Track the most negative current_position to make sure new specs are placed at the top
+    let temporaryDefaultPosition = -1;
+
     const initialData: DataType[] =
       moduleGroupSpecs?.map((spec) => {
         const moduleSpec = moduleSpecs?.find((s) => s.module_spec_id === spec.module_spec_id);
-        const currentPosition = specsPositions?.find((pos) => pos.module_group_specs_id === Number(spec.id))?.current_position;
+        let currentPosition = specsPositions?.find((pos) => pos.module_group_specs_id === Number(spec.id))?.current_position;
+
+        // Set the default current_position for new items
+        if (currentPosition === undefined || currentPosition === -1) {
+          currentPosition = temporaryDefaultPosition;
+          temporaryDefaultPosition--; // Decrease the position for the next new spec
+        }
+
         return {
           key: spec.id,
           name: moduleSpec?.name || "",
-          current_position: currentPosition !== undefined ? currentPosition : -1, // Default to -1 if not found
+          current_position: currentPosition,
           disabled: spec.disabled,
         };
       }) || [];
+    const sortedData = initialData.sort((a, b) => a.current_position - b.current_position);
 
-    // Sort initialData based on current_position
-    initialData.sort((a, b) => a.current_position - b.current_position);
-
-    setData([...initialData]);
+    setData(sortedData);
   }, [moduleGroupSpecs, moduleSpecs, specsPositions]);
 
   const [data, setData] = useState<DataType[]>([]);
@@ -156,9 +166,7 @@ const DraggableTable: React.FC = () => {
       module_group_id: id,
       current_position: index,
     }));
-    console.log("payload", payload);
 
-    // Call the API to update the positions
     updateSpecsPositions(id, payload);
   };
 

@@ -10,9 +10,11 @@ export type ModuleGroup = {
   name: ModuleGroupNames;
 };
 
-export type ModuleGroupSpecModuleSpecIds = {
+export type ModuleGroupSpecs = {
   id: number;
   module_spec_id: string;
+  module_group_id: number;
+  disabled: boolean;
 };
 
 export type ModuleGroupNames =

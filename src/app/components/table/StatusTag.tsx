@@ -15,7 +15,7 @@ function TableStatusTag(props: TagProps) {
 
 export default TableStatusTag;
 
-const TagCss = styled.span<CssProps>`
+export const TagCss = styled.span<CssProps>`
   height: 24px;
   padding: 4px 12px;
   margin-right: 8px;

@@ -11,10 +11,7 @@ export async function getSpecsPositions(id: number): Promise<SpecPosition[]> {
   }
 }
 
-export async function updateSpecsPositions(
-  id: number,
-  data: SpecPosition[]
-): Promise<void> {
+export async function updateSpecsPositions(id: number, data: SpecPosition[]): Promise<void> {
   try {
     console.log("data to be upserted", data);
     await axios.put(`/api/specs-positions/${id}`, data);

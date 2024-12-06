@@ -1,6 +1,6 @@
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "../data/query-keys";
-import { getModuleGroupSpecs, addModuleGroupSpec, deleteModuleGroupSpec, updateModuleGroupSpec } from "../api/module-group-spec-module-specs/[id]";
+import { getModuleGroupSpecs, addModuleGroupSpec, deleteModuleGroupSpec, updateModuleGroupSpec } from "../api/module-group-specs/[id]";
 import { ModuleSpec } from "../data/typings";
 
 export function useModuleGroupSpecs(id: number) {

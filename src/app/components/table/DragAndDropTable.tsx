@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Skeleton, Space, Table } from "antd";
+import { Button, Empty, Modal, Skeleton, Space, Table } from "antd";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import {
   DeleteOutlined,
@@ -19,11 +19,12 @@ import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
 import { useLayoutTypeContext } from "../drawer/layout/LayoutProvider";
-import TableStatusTag from "./StatusTag";
+import TableStatusTag, { TagCss } from "./StatusTag";
 import { useMobileLayoutConfig } from "@/app/hooks/use-mobile-layout-config";
 import { getMobileConfigIDS } from "@/app/api/mobile-layout-configuration";
 import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
 import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
+import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
 
 interface DataType {
   key: string;
@@ -42,54 +43,94 @@ const DraggableTable: React.FC = () => {
   const { specsPositions } = useSpecsPositions(id);
   const { mobileConfig } = useMobileLayoutConfig(selectedSpecId);
   const { desktopConfig } = useDesktopLayoutConfig(selectedSpecId);
-  const [mobilePublishedIds, setMobilePublishedIds] = useState<number[]>([]);
-  const [desktopPublishedIds, setDesktopPublishedIds] = useState<number[]>([]);
+  const [mobilePublishedLayout, setMobilePublishedLayout] = useState<number[]>([]);
+  const [desktopPublishedLayout, setDesktopPublishedLayout] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [mobileTitles, setMobileTitles] = useState<Array<string | undefined>>([]);
+  const [desktopTitles, setDesktopTitles] = useState<Array<string | undefined>>([]);
 
   useEffect(() => {
-    const fetchPublishedIds = async () => {
+    const fetchPublishedLayout = async () => {
       try {
-        const [mobilePublishedIds, desktopPublishedIds] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
-
-        setMobilePublishedIds(mobilePublishedIds?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
-        setDesktopPublishedIds(desktopPublishedIds?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
+        const [mobilePublishedLayout, desktopPublishedLayout] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
+        setMobilePublishedLayout(mobilePublishedLayout?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
+        setDesktopPublishedLayout(desktopPublishedLayout?.map((spec: { spec_id: number }) => spec.spec_id) ?? []);
 
         const isPublished =
           selectedSpecId &&
-          (mobilePublishedIds?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId) ||
-            desktopPublishedIds?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId));
-
+          (mobilePublishedLayout?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId) ||
+            desktopPublishedLayout?.some((spec: { spec_id: number }) => spec.spec_id === selectedSpecId));
+        setLoading(false);
         return isPublished ? "published" : "draft";
+      } catch (error) {
+        console.error("Error fetching published IDs:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchPublishedLayout();
+  }, [mobileConfig, desktopConfig, selectedSpecId]);
+  //review this
+  useEffect(() => {
+    const fetchPublishedLayout = async () => {
+      try {
+        const [mobileData, desktopData]: [MobileLayoutConfig[], DesktopLayoutConfig[]] = await Promise.all([
+          getMobileConfigIDS(),
+          getDesktopConfigIDS(),
+        ]);
+
+        if (moduleGroupSpecs) {
+          const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
+          const mobileIds = mobileData.map((item) => item.spec_id);
+          const desktopIds = desktopData.map((item) => item.spec_id);
+          const matchingMobileIds = moduleGroupSpecIds.filter((id) => mobileIds.includes(id));
+          const matchingMobileTitles = mobileData.filter((item) => matchingMobileIds.includes(item.spec_id)).map((item) => item.title);
+          const matchingDesktopIds = moduleGroupSpecIds.filter((id) => desktopIds.includes(id));
+          const matchingDesktopTitles = desktopData.filter((item) => matchingDesktopIds.includes(item.spec_id)).map((item) => item.title);
+
+          setMobileTitles(matchingMobileTitles);
+          setDesktopTitles(matchingDesktopTitles);
+        }
       } catch (error) {
         console.error("Error fetching published IDs:", error);
       }
     };
-
-    fetchPublishedIds();
-  }, [mobileConfig, desktopConfig]);
+    fetchPublishedLayout();
+  }, [moduleGroupSpecs]);
 
   useEffect(() => {
+    if (!specsPositions) return;
+
+    // Track the most negative current_position to make sure new specs are placed at the top
+    let temporaryDefaultPosition = -1;
+
     const initialData: DataType[] =
       moduleGroupSpecs?.map((spec) => {
         const moduleSpec = moduleSpecs?.find((s) => s.module_spec_id === spec.module_spec_id);
-        const currentPosition = specsPositions?.find((pos) => pos.module_group_spec_module_specs_id === Number(spec.id))?.current_position;
+        let currentPosition = specsPositions?.find((pos) => pos.module_group_specs_id === Number(spec.id))?.current_position;
+
+        // Set the default current_position for new items
+        if (currentPosition === undefined || currentPosition === -1) {
+          currentPosition = temporaryDefaultPosition;
+          temporaryDefaultPosition--; // Decrease the position for the next new spec
+        }
+
         return {
           key: spec.id,
           name: moduleSpec?.name || "",
-          current_position: currentPosition !== undefined ? currentPosition : -1, // Default to -1 if not found
+          current_position: currentPosition,
           disabled: spec.disabled,
         };
       }) || [];
+    const sortedData = initialData.sort((a, b) => a.current_position - b.current_position);
 
-    // Sort initialData based on current_position
-    initialData.sort((a, b) => a.current_position - b.current_position);
-
-    setData([...initialData]);
+    setData(sortedData);
   }, [moduleGroupSpecs, moduleSpecs, specsPositions]);
 
   const [data, setData] = useState<DataType[]>([]);
 
   if (isLoading) return isLoading && <Skeleton active />;
-  if (error) return <div>Failed to load module specs</div>;
+  if (error) return <Empty description="Failed to load module specs" />;
 
   const { confirm } = Modal;
   const showDeleteConfirm = (spec: DataType) => {
@@ -121,13 +162,11 @@ const DraggableTable: React.FC = () => {
 
     // Prepare the payload for the API call
     const payload = updatedData.map((item, index) => ({
-      module_group_spec_module_specs_id: Number(item.key),
-      module_group_spec_id: id,
+      module_group_specs_id: Number(item.key),
+      module_group_id: id,
       current_position: index,
     }));
-    console.log("payload", payload);
 
-    // Call the API to update the positions
     updateSpecsPositions(id, payload);
   };
 
@@ -136,6 +175,13 @@ const DraggableTable: React.FC = () => {
     if (moduleSpec) {
       updateModuleSpec({ ...moduleSpec, disabled: !record.disabled });
     }
+  };
+  const renderStatusTag = (loading: boolean, publishedLayout: number[], record: DataType) => {
+    if (loading) {
+      return <Skeleton.Button active style={{ height: 20 }} />;
+    }
+    const isPublished = publishedLayout.includes(Number(record.key ?? 0));
+    return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
   };
 
   const columns = [
@@ -152,6 +198,19 @@ const DraggableTable: React.FC = () => {
       key: "name",
     },
     {
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      render: (_: any, __: any, index: number) => {
+        const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
+        if (isPublished) {
+          const publishedIndex = mobilePublishedLayout.indexOf(Number(data[index].key ?? 0));
+          return <TitlePreview>{mobileTitles[publishedIndex]}</TitlePreview>;
+        }
+        return null;
+      },
+    },
+    {
       title: (
         <Space>
           Mobile <MobileOutlined />
@@ -159,6 +218,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "mobile",
       key: "mobile",
+      className: "min-width",
       onCell: (record: DataType) => ({
         onClick: () => {
           showMobileDrawer(Number(record.key), record.name);
@@ -182,10 +242,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "status",
       key: "status",
-      render: (_: any, record: DataType) => {
-        const isPublished = mobilePublishedIds.includes(Number(record.key ?? 0));
-        return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
-      },
+      render: (_: any, record: DataType) => renderStatusTag(loading, mobilePublishedLayout, record),
     },
     {
       title: (
@@ -195,6 +252,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "desktop",
       key: "desktop",
+      className: "min-width",
       onCell: (record: DataType) => ({
         onClick: () => {
           showDesktopDrawer(Number(record.key), record.name);
@@ -218,10 +276,7 @@ const DraggableTable: React.FC = () => {
       ),
       dataIndex: "status",
       key: "status",
-      render: (_: any, record: DataType) => {
-        const isPublished = desktopPublishedIds.includes(Number(record.key ?? 0));
-        return <TableStatusTag variant={isPublished ? "published" : "draft"}>{isPublished ? "Published" : "Draft"}</TableStatusTag>;
-      },
+      render: (_: any, record: DataType) => renderStatusTag(loading, desktopPublishedLayout, record),
     },
     {
       title: "Disabled",
@@ -366,7 +421,10 @@ const TableRow = styled.tr`
   :hover {
     background: ${(p) => p.theme.colors.gray100};
   }
-
+  .min-width > span {
+    min-width: 85px;
+    text-align: center;
+  }
   button {
     display: none;
     box-shadow: none;
@@ -399,4 +457,8 @@ const TextCss = styled.span`
   color: ${(p) => p.theme.colors.primary500};
   padding: 10px;
   cursor: pointer;
+`;
+
+const TitlePreview = styled.p`
+  text-overflow: ellipsis;
 `;

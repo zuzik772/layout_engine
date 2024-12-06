@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import SelectableDropdown from "@/app/components/ant/Dropdown";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import DragAndDropTable from "@/app/components/table/DragAndDropTable";
@@ -10,6 +9,8 @@ import { useModuleGroups } from "@/app/hooks/use-module-groups";
 import { Button } from "antd";
 import AntDrawer from "@/app/components/drawer/AntDrawer";
 import LayoutTypeProvider from "@/app/components/drawer/layout/LayoutProvider";
+import SelectableMobileSpec from "@/app/components/dropdown/SelectableModuleSpec";
+import SelectableLivePreview from "@/app/components/live-preview/SelectableLivePreview";
 
 export default function ModuleSpecsPage() {
   const pathname = usePathname();
@@ -17,8 +18,7 @@ export default function ModuleSpecsPage() {
   const { moduleGroups } = useModuleGroups();
 
   //   sportsbook home etc.
-  const moduleGroup =
-    moduleGroups && moduleGroups.find((spec) => spec.id === id);
+  const moduleGroup = moduleGroups && moduleGroups.find((spec) => spec.id === id);
 
   return (
     <Container>
@@ -30,7 +30,8 @@ export default function ModuleSpecsPage() {
         </Link>
         <h2>{moduleGroup?.name}</h2>
         <Wrapper>
-          <SelectableDropdown />
+          <SelectableLivePreview />
+          <SelectableMobileSpec />
         </Wrapper>
       </FlexContainer>
       <TableWrapper>
@@ -52,6 +53,8 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   overflow: auto;
+  display: flex;
+  gap: 1rem;
 `;
 
 const TableWrapper = styled.div`

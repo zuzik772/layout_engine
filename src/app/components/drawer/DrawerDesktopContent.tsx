@@ -1,5 +1,5 @@
 import { Form, Row, Col, Input, Select, Button, message, CheckboxProps, Skeleton } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import ContainerMode from "./ContainerMode";
 import { useDebouncedCallback } from "use-debounce";
@@ -19,15 +19,18 @@ const DrawerDesktopContent = () => {
 
   const selectedDesktopConfig: DesktopLayoutConfig = Array.isArray(desktopConfig) ? desktopConfig[0] : desktopConfig;
 
-  const defaultValue: DesktopLayoutConfig = {
-    spec_id: selectedSpecId ?? 0,
-    title: "",
-    type: "",
-    layout_option: "3/3",
-    boxed: false,
-    columns: 1,
-    rows: 1,
-  };
+  const defaultValue: DesktopLayoutConfig = useMemo(
+    () => ({
+      spec_id: selectedSpecId ?? 0,
+      title: "",
+      type: "",
+      layout_option: "3/3",
+      boxed: false,
+      columns: 1,
+      rows: 1,
+    }),
+    [selectedSpecId]
+  );
 
   useEffect(() => {
     form.resetFields();
@@ -41,7 +44,7 @@ const DrawerDesktopContent = () => {
       form.setFieldsValue(defaultValue);
       setDrawerState("create");
     }
-  }, [selectedSpecId, desktopConfig, form, selectedDesktopConfig, setDrawerState]);
+  }, [selectedSpecId, desktopConfig, form, selectedDesktopConfig, setDrawerState, defaultValue]);
 
   const debouncedTitle = useDebouncedCallback(
     (newTitle) => {

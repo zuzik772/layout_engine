@@ -4,7 +4,7 @@ import { useDrawerContext } from "@/app/providers/DrawerProvider";
 import { Form, Input, Select, CheckboxProps, Space, Button, Skeleton, message } from "antd";
 import { StyledFormItem } from "./DrawerDesktopContent";
 import ContainerMode from "./ContainerMode";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import MobileLayoutConfiguration from "./layout/MobileLayoutConfiguration";
 import { useMobileLayoutConfig } from "@/app/hooks/use-mobile-layout-config";
@@ -19,14 +19,18 @@ function DrawerMobileContent() {
   const { Option } = Select;
 
   const selectedMobileConfig: MobileLayoutConfig = Array.isArray(mobileConfig) ? mobileConfig[0] : mobileConfig;
-  const defaultValue: MobileLayoutConfig = {
-    spec_id: selectedSpecId ?? 0,
-    title: "",
-    type: "",
-    boxed: false,
-    columns: 1,
-    rows: 1,
-  };
+
+  const defaultValue: MobileLayoutConfig = useMemo(
+    () => ({
+      spec_id: selectedSpecId ?? 0,
+      title: "",
+      type: "",
+      boxed: false,
+      columns: 1,
+      rows: 1,
+    }),
+    [selectedSpecId]
+  );
 
   useEffect(() => {
     form.resetFields();
@@ -40,7 +44,7 @@ function DrawerMobileContent() {
       form.setFieldsValue(defaultValue);
       setDrawerState("create");
     }
-  }, [selectedSpecId, mobileConfig, form]);
+  }, [selectedSpecId, mobileConfig, form, selectedMobileConfig, setDrawerState, defaultValue]);
 
   const debouncedTitle = useDebouncedCallback(
     (newTitle) => {

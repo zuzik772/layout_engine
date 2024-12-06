@@ -26,28 +26,24 @@ const LayoutPreview = ({ selectedLayout, numberOfColumns, numberOfRows, isContai
   };
 
   return (
-    <Row>
-      <Col span={24}>
-        <StyledFormItem label={"Layout Preview"}>
-          <WrapperCss>
-            {selectedLayout && (
-              <LayoutPreviewCss selectedLayout={selectedLayout} span={getLayoutSpan()} isContainer={isContainer}>
-                <TitlePreview>{title}</TitlePreview>
-                {/* Nested Grid for Columns and Rows */}
-                <InternalGrid numberOfColumns={numberOfColumns} numberOfRows={numberOfRows}>
-                  {Array.from({ length: numberOfColumns * numberOfRows }).map((_, index) => (
-                    <GridCell key={index}>
-                      {/* C{Math.floor(index / numberOfColumns) + 1}R
+    <StyledFormItem label={"Layout Preview"}>
+      <WrapperCss>
+        {selectedLayout && (
+          <LayoutPreviewCss selectedLayout={selectedLayout} span={getLayoutSpan()} isContainer={isContainer}>
+            <TitlePreview>{title}</TitlePreview>
+            {/* Nested Grid for Columns and Rows */}
+            <InternalGrid numberOfColumns={numberOfColumns} numberOfRows={numberOfRows}>
+              {Array.from({ length: numberOfColumns * numberOfRows }).map((_, index) => (
+                <GridCell key={index}>
+                  {/* C{Math.floor(index / numberOfColumns) + 1}R
                       {(index % numberOfRows) + 1} */}
-                    </GridCell>
-                  ))}
-                </InternalGrid>
-              </LayoutPreviewCss>
-            )}
-          </WrapperCss>
-        </StyledFormItem>
-      </Col>
-    </Row>
+                </GridCell>
+              ))}
+            </InternalGrid>
+          </LayoutPreviewCss>
+        )}
+      </WrapperCss>
+    </StyledFormItem>
   );
 };
 

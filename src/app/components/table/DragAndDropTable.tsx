@@ -48,6 +48,7 @@ const DraggableTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [mobileTitles, setMobileTitles] = useState<Array<string | undefined>>([]);
   const [desktopTitles, setDesktopTitles] = useState<Array<string | undefined>>([]);
+
   useEffect(() => {
     const fetchPublishedLayout = async () => {
       try {
@@ -77,20 +78,16 @@ const DraggableTable: React.FC = () => {
           getMobileConfigIDS(),
           getDesktopConfigIDS(),
         ]);
-        console.log("heeey", mobileData, desktopData);
+
         if (moduleGroupSpecs) {
           const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
-          console.log("moduleGroupSpecIds", moduleGroupSpecIds);
           const mobileIds = mobileData.map((item) => item.spec_id);
-          console.log("mobileIds", mobileIds);
           const desktopIds = desktopData.map((item) => item.spec_id);
           const matchingMobileIds = moduleGroupSpecIds.filter((id) => mobileIds.includes(id));
           const matchingMobileTitles = mobileData.filter((item) => matchingMobileIds.includes(item.spec_id)).map((item) => item.title);
-          console.log("matchingMobileTitles", matchingMobileTitles);
           const matchingDesktopIds = moduleGroupSpecIds.filter((id) => desktopIds.includes(id));
-          console.log("matchingMobileIds", matchingMobileIds);
           const matchingDesktopTitles = desktopData.filter((item) => matchingDesktopIds.includes(item.spec_id)).map((item) => item.title);
-          console.log("matchingDesktopTitles", matchingDesktopTitles);
+
           setMobileTitles(matchingMobileTitles);
           setDesktopTitles(matchingDesktopTitles);
         }
@@ -99,7 +96,7 @@ const DraggableTable: React.FC = () => {
       }
     };
     fetchPublishedLayout();
-  }, []);
+  }, [moduleGroupSpecs]);
 
   useEffect(() => {
     const initialData: DataType[] =
@@ -196,9 +193,20 @@ const DraggableTable: React.FC = () => {
       title: "Title",
       dataIndex: "title",
       key: "title",
+      // render: (_: any, __: any, index: number) => {
+      //   const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
+      //   return isPublished ? <TitlePreview>{mobileTitles[0]}</TitlePreview> : null;
+      // },
+
       render: (_: any, __: any, index: number) => {
         const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
-        return isPublished ? <TitlePreview>{mobileTitles[0]}</TitlePreview> : null;
+        if (isPublished) {
+          const publishedIndex = mobilePublishedLayout.indexOf(Number(data[index].key ?? 0));
+          console.log("publishedIndex", publishedIndex);
+          console.log("mobilePublishedLayout", mobilePublishedLayout);
+          return <TitlePreview>{mobileTitles[publishedIndex]}</TitlePreview>;
+        }
+        return null;
       },
     },
     {

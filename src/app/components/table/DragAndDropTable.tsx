@@ -193,17 +193,10 @@ const DraggableTable: React.FC = () => {
       title: "Title",
       dataIndex: "title",
       key: "title",
-      // render: (_: any, __: any, index: number) => {
-      //   const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
-      //   return isPublished ? <TitlePreview>{mobileTitles[0]}</TitlePreview> : null;
-      // },
-
       render: (_: any, __: any, index: number) => {
         const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
         if (isPublished) {
           const publishedIndex = mobilePublishedLayout.indexOf(Number(data[index].key ?? 0));
-          console.log("publishedIndex", publishedIndex);
-          console.log("mobilePublishedLayout", mobilePublishedLayout);
           return <TitlePreview>{mobileTitles[publishedIndex]}</TitlePreview>;
         }
         return null;

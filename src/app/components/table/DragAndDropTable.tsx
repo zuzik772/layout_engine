@@ -153,7 +153,7 @@ const DraggableTable: React.FC = () => {
     // Prepare the payload for the API call
     const payload = updatedData.map((item, index) => ({
       module_group_specs_id: Number(item.key),
-      module_groups_id: id,
+      module_group_id: id,
       current_position: index,
     }));
     console.log("payload", payload);

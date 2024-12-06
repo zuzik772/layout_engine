@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../data/query-keys";
 
 import { SpecPosition } from "../data/typings";
-import { addSpecPosition, getSpecsPositions, updateSpecsPositions } from "../api/specs-positions/[id]";
+import { getSpecsPositions, updateSpecsPositions } from "../api/specs-positions/[id]";
 
 export function useSpecsPositions(id: number) {
   const queryClient = useQueryClient();
@@ -37,33 +37,10 @@ export function useSpecsPositions(id: number) {
     },
   });
 
-  const addSpecPositionMutation = useMutation({
-    mutationFn: (specPosition: SpecPosition) => addSpecPosition(id, specPosition),
-    onMutate: async (specPosition: SpecPosition) => {
-      await queryClient.cancelQueries({
-        queryKey: [queryKeys.specsPositions, id],
-      });
-      const previousSpecPosition = queryClient.getQueryData<SpecPosition[]>([queryKeys.specsPositions, id]);
-      //optimistic update to the new position
-      queryClient.setQueryData<SpecPosition[]>([queryKeys.specsPositions, id], (old = []) => [...old, specPosition]);
-      return { previousSpecPosition };
-    },
-    onError: (err, newData, context) => {
-      queryClient.setQueryData<SpecPosition[]>([queryKeys.specsPositions, id], context?.previousSpecPosition);
-      console.error("Error adding spec position:", err);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKeys.specsPositions, id],
-      });
-    },
-  });
-
   return {
     isLoading,
     error,
     specsPositions: data,
     updateSpecsPositions: updateSpecsPositionsMutation.mutate,
-    addSpecPosition: addSpecPositionMutation.mutate,
   };
 }

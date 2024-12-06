@@ -5,7 +5,6 @@ import { Button, Dropdown, Space, Typography } from "antd";
 import { usePathname } from "next/navigation";
 import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 import { useModuleSpecs } from "@/app/hooks/use-module-specs";
-import { addSpecPosition } from "@/app/api/specs-positions/[id]";
 
 const SelectableMobileSpec = () => {
   const { moduleSpecs } = useModuleSpecs();
@@ -28,12 +27,6 @@ const SelectableMobileSpec = () => {
       console.error("Selected module spec not found");
       return;
     }
-    console.log("selectedModuleSpec", selectedModuleSpec);
-    addModuleSpec(selectedModuleSpec);
-    console.log("selectedModuleSpec", selectedModuleSpec);
-    //add also position of the module spec
-    // addModuleSpecPosition(selectedModuleSpec);
-    // addSpecPosition(id, spec_id, postion);
   };
 
   return (

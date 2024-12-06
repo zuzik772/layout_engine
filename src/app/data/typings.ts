@@ -41,7 +41,7 @@ export type ModuleGroupNames =
 
 export type SpecPosition = {
   module_group_specs_id: number;
-  module_groups_id: number;
+  module_group_id: number;
   current_position: number;
 };
 

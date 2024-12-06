@@ -20,13 +20,3 @@ export async function updateSpecsPositions(id: number, data: SpecPosition[]): Pr
     throw error;
   }
 }
-
-export async function addSpecPosition(id: number, specPosition: SpecPosition): Promise<SpecPosition> {
-  try {
-    const res = await axios.post(`/api/specs-positions/${id}`, specPosition);
-    return res.data;
-  } catch (error) {
-    console.error("Error posting spec position:", error);
-    throw error;
-  }
-}

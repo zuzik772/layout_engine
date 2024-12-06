@@ -75,7 +75,7 @@ const ModalContent = ({
   console.log(moduleGroupSpecs);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedPreview, setSelectedPreview] = useState<MobileLayoutConfig[] | DesktopLayoutConfig[]>();
+  const [selectedPreview, setSelectedPreview] = useState<any>();
   const [publishedIds, setPublishedIds] = useState<number[]>([]);
   useEffect(() => {
     const fetchPublishedLayout = async () => {
@@ -93,6 +93,7 @@ const ModalContent = ({
           const matchingPreviewIds = moduleGroupSpecIds.filter((id) => previewDataIds.includes(id));
           setPublishedIds(matchingPreviewIds);
           const matchedPreviewData = data.filter((item) => matchingPreviewIds.includes(item.spec_id));
+          console.log("matchedPreviewData", matchedPreviewData);
           setSelectedPreview(matchedPreviewData);
         }
       } catch (error) {
@@ -104,7 +105,7 @@ const ModalContent = ({
       setIsLoading(true);
       fetchPublishedLayout();
     }
-  }, [previewMode]);
+  }, [moduleGroupSpecs, previewMode]);
 
   return (
     <ModalCss

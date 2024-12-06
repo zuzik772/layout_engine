@@ -1,13 +1,42 @@
-import React from "react";
+import React, { use, useState } from "react";
 import styled from "styled-components";
 import { Row, Col, Empty } from "antd";
 import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
+import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
+import { usePathname } from "next/navigation";
 
-const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig[] | DesktopLayoutConfig[] }) => {
+const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | DesktopLayoutConfig }) => {
+  const pathname = usePathname();
+  const id = Number(pathname.split("/")[3]);
+  const { specsPositions } = useSpecsPositions(id);
+  console.log("whats specsPositions", specsPositions);
+  const [sortedPositions, setSortedPositions] = useState<number[]>([]);
   if (!Array.isArray(layoutConfig)) {
     return null;
   }
-  console.log(layoutConfig);
+
+  let sortedLayoutConfig = [];
+  if (specsPositions && specsPositions.length > 0) {
+    const filteredLayoutConfig = layoutConfig.filter((config) =>
+      specsPositions.some((position) => position.module_group_specs_id === config.spec_id)
+    );
+
+    console.log("whats filteredLayoutConfig", filteredLayoutConfig);
+
+    // Find current_position for filteredLayoutConfig and sort them
+    const sortedPositions = filteredLayoutConfig
+      .map((config) => {
+        const position = specsPositions.find((position) => position.module_group_specs_id === config.spec_id);
+        return { ...config, current_position: position?.current_position ?? -1 };
+      })
+      .sort((a, b) => a.current_position - b.current_position);
+
+    sortedLayoutConfig = sortedPositions;
+  } else {
+    sortedLayoutConfig = layoutConfig;
+  }
+
+  console.log("whats layoutConfig", layoutConfig);
   const getLayoutSpan = (layout_option: string) => {
     switch (layout_option) {
       case "1/3":
@@ -19,24 +48,22 @@ const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig[] | De
         return 24; // Full width
     }
   };
-  const isDesktopLayoutConfig = (item: any): item is DesktopLayoutConfig => {
-    return (item as DesktopLayoutConfig).layout_option !== undefined;
-  };
+
   return (
     <WrapperCss>
       {layoutConfig.length === 0 ? (
         <Empty description="Layout configuration not found" />
       ) : (
         <Row gutter={[16, 16]}>
-          {layoutConfig.map((item, index) => {
-            const span = isDesktopLayoutConfig(item) ? getLayoutSpan(item.layout_option ?? "3/3") : 24;
+          {sortedLayoutConfig.map((item, index) => {
+            const span = getLayoutSpan(item.layout_option ?? "3/3");
 
             return (
               <Col span={span} key={index}>
                 <LivePreviewCss isContainer={item.boxed ?? false}>
                   <TitlePreview>{item.title}</TitlePreview>
-                  <NestedGrid numberOfColumns={item.columns ?? 1} numberOfRows={item.rows ?? 1}>
-                    {Array.from({ length: item.columns ?? 1 * (item.rows ?? 1) }).map((_, index) => (
+                  <NestedGrid numberOfColumns={item.columns} numberOfRows={item.rows}>
+                    {Array.from({ length: item.columns * item.rows }).map((_, index) => (
                       <GridCell key={index} />
                     ))}
                   </NestedGrid>

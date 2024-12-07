@@ -25,10 +25,10 @@ const SelectableLivePreview = () => {
     []
   );
 
-  const handleSelect: MenuProps["onSelect"] = (e) => {
+  const handleSelect = (key: string) => {
     setModalState({
       isModalOpen: true,
-      previewMode: e.key as "mobile" | "desktop",
+      previewMode: key as "mobile" | "desktop",
     });
   };
 
@@ -44,8 +44,7 @@ const SelectableLivePreview = () => {
       <Dropdown
         menu={{
           items,
-          selectable: true,
-          onSelect: handleSelect,
+          onClick: (e) => handleSelect(e.key),
           style: { maxHeight: 400, overflowY: "auto" },
         }}
       >

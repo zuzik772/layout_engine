@@ -31,7 +31,7 @@ interface DataType {
   disabled: boolean;
 }
 const DraggableTable: React.FC = () => {
-  const { showMobileDrawer, showDesktopDrawer, drawerState, selectedSpecId } = useDrawerContext();
+  const { showMobileDrawer, showDesktopDrawer, selectedSpecId } = useDrawerContext();
   const { setIsMobileLayout } = useLayoutTypeContext();
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
@@ -44,8 +44,6 @@ const DraggableTable: React.FC = () => {
   const [mobilePublishedLayout, setMobilePublishedLayout] = useState<number[]>([]);
   const [desktopPublishedLayout, setDesktopPublishedLayout] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [mobileTitles, setMobileTitles] = useState<Array<string | undefined>>([]);
-  // const [desktopTitles, setDesktopTitles] = useState<Array<string | undefined>>([]);
 
   useEffect(() => {
     const fetchPublishedLayout = async () => {
@@ -68,33 +66,6 @@ const DraggableTable: React.FC = () => {
 
     fetchPublishedLayout();
   }, [mobileConfig, desktopConfig, selectedSpecId]);
-  //review this
-  // useEffect(() => {
-  //   const fetchPublishedLayout = async () => {
-  //     try {
-  //       const [mobileData, desktopData]: [MobileLayoutConfig[], DesktopLayoutConfig[]] = await Promise.all([
-  //         getMobileConfigIDS(),
-  //         getDesktopConfigIDS(),
-  //       ]);
-
-  //       if (moduleGroupSpecs) {
-  //         const moduleGroupSpecIds = moduleGroupSpecs.map((spec) => Number(spec.id));
-  //         const mobileIds = mobileData.map((item) => item.spec_id);
-  //         const desktopIds = desktopData.map((item) => item.spec_id);
-  //         const matchingMobileIds = moduleGroupSpecIds.filter((id) => mobileIds.includes(id));
-  //         const matchingMobileTitles = mobileData.filter((item) => matchingMobileIds.includes(item.spec_id)).map((item) => item.title);
-  //         const matchingDesktopIds = moduleGroupSpecIds.filter((id) => desktopIds.includes(id));
-  //         const matchingDesktopTitles = desktopData.filter((item) => matchingDesktopIds.includes(item.spec_id)).map((item) => item.title);
-
-  //         setMobileTitles(matchingMobileTitles);
-  //         setDesktopTitles(matchingDesktopTitles);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching published IDs:", error);
-  //     }
-  //   };
-  //   fetchPublishedLayout();
-  // }, [moduleGroupSpecs]);
 
   useEffect(() => {
     if (!specsPositions) return;
@@ -195,19 +166,6 @@ const DraggableTable: React.FC = () => {
       dataIndex: "name",
       key: "name",
     },
-    // {
-    //   title: "Title",
-    //   dataIndex: "title",
-    //   key: "title",
-    //   render: (_: any, __: any, index: number) => {
-    //     const isPublished = mobilePublishedLayout.includes(Number(data[index].key ?? 0));
-    //     if (isPublished) {
-    //       const publishedIndex = mobilePublishedLayout.indexOf(Number(data[index].key ?? 0));
-    //       return <TitlePreview>{mobileTitles[publishedIndex]}</TitlePreview>;
-    //     }
-    //     return null;
-    //   },
-    // },
     {
       title: (
         <Space>
@@ -455,8 +413,4 @@ const TextCss = styled.span`
   color: ${(p) => p.theme.colors.primary500};
   padding: 10px;
   cursor: pointer;
-`;
-
-const TitlePreview = styled.p`
-  text-overflow: ellipsis;
 `;

@@ -1,42 +1,13 @@
-import React, { use, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Row, Col, Empty } from "antd";
-import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
-import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
-import { usePathname } from "next/navigation";
+import { LayoutConfig } from "@/app/data/typings";
 
-const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | DesktopLayoutConfig }) => {
-  const pathname = usePathname();
-  const id = Number(pathname.split("/")[3]);
-  const { specsPositions } = useSpecsPositions(id);
-  console.log("whats specsPositions", specsPositions);
-  const [sortedPositions, setSortedPositions] = useState<number[]>([]);
+const LivePreview = ({ layoutConfig }: { layoutConfig: LayoutConfig[] }) => {
   if (!Array.isArray(layoutConfig)) {
     return null;
   }
 
-  let sortedLayoutConfig = [];
-  if (specsPositions && specsPositions.length > 0) {
-    const filteredLayoutConfig = layoutConfig.filter((config) =>
-      specsPositions.some((position) => position.module_group_specs_id === config.spec_id)
-    );
-
-    console.log("whats filteredLayoutConfig", filteredLayoutConfig);
-
-    // Find current_position for filteredLayoutConfig and sort them
-    const sortedPositions = filteredLayoutConfig
-      .map((config) => {
-        const position = specsPositions.find((position) => position.module_group_specs_id === config.spec_id);
-        return { ...config, current_position: position?.current_position ?? -1 };
-      })
-      .sort((a, b) => a.current_position - b.current_position);
-
-    sortedLayoutConfig = sortedPositions;
-  } else {
-    sortedLayoutConfig = layoutConfig;
-  }
-
-  console.log("whats layoutConfig", layoutConfig);
   const getLayoutSpan = (layout_option: string) => {
     switch (layout_option) {
       case "1/3":
@@ -55,7 +26,7 @@ const LivePreview = ({ layoutConfig }: { layoutConfig: MobileLayoutConfig | Desk
         <Empty description="Layout configuration not found" />
       ) : (
         <Row gutter={[16, 16]}>
-          {sortedLayoutConfig.map((item, index) => {
+          {layoutConfig.map((item, index) => {
             const span = getLayoutSpan(item.layout_option ?? "3/3");
 
             return (

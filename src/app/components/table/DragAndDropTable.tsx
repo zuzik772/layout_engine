@@ -17,14 +17,12 @@ import { usePathname } from "next/navigation";
 import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
 import { useModuleSpecs } from "@/app/hooks/use-module-specs";
 import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
-import { updateSpecsPositions } from "@/app/api/specs-positions/[id]";
 import { useLayoutTypeContext } from "../drawer/layout/LayoutProvider";
 import TableStatusTag, { TagCss } from "./StatusTag";
 import { useMobileLayoutConfig } from "@/app/hooks/use-mobile-layout-config";
 import { getMobileConfigIDS } from "@/app/api/mobile-layout-configuration";
 import { useDesktopLayoutConfig } from "@/app/hooks/use-desktop-layout-config";
 import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
-import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
 
 interface DataType {
   key: string;
@@ -40,7 +38,7 @@ const DraggableTable: React.FC = () => {
 
   const { isLoading, error, moduleGroupSpecs, deleteModuleSpec, updateModuleSpec } = useModuleGroupSpecs(id);
   const { moduleSpecs } = useModuleSpecs();
-  const { specsPositions } = useSpecsPositions(id);
+  const { specsPositions, updateSpecsPositions } = useSpecsPositions(id);
   const { mobileConfig } = useMobileLayoutConfig(selectedSpecId);
   const { desktopConfig } = useDesktopLayoutConfig(selectedSpecId);
   const [mobilePublishedLayout, setMobilePublishedLayout] = useState<number[]>([]);
@@ -48,7 +46,7 @@ const DraggableTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   // const [mobileTitles, setMobileTitles] = useState<Array<string | undefined>>([]);
   // const [desktopTitles, setDesktopTitles] = useState<Array<string | undefined>>([]);
-  console.log("whats publishedLayout", mobilePublishedLayout);
+
   useEffect(() => {
     const fetchPublishedLayout = async () => {
       try {
@@ -167,7 +165,7 @@ const DraggableTable: React.FC = () => {
       current_position: index,
     }));
 
-    updateSpecsPositions(id, payload);
+    updateSpecsPositions(payload);
   };
 
   const handleDisabled = (record: DataType) => {

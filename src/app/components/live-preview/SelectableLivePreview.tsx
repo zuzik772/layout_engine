@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Button, Dropdown, Modal, Skeleton, Typography } from "antd";
@@ -17,10 +17,13 @@ const SelectableLivePreview = () => {
     previewMode: null as "mobile" | "desktop" | null,
   });
 
-  const items: MenuProps["items"] = [
-    { key: "mobile", label: "Mobile Preview" },
-    { key: "desktop", label: "Desktop Preview" },
-  ];
+  const items: MenuProps["items"] = useMemo(
+    () => [
+      { key: "mobile", label: "Mobile Preview" },
+      { key: "desktop", label: "Desktop Preview" },
+    ],
+    []
+  );
 
   const handleSelect: MenuProps["onSelect"] = (e) => {
     setModalState({
@@ -77,36 +80,25 @@ const ModalContent = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [layoutConfig, setLayoutConfig] = useState<LayoutConfig[]>();
 
-  const fetchPublishedLayout = useCallback(async () => {
+  const fetchPublishedLayout = useCallback(async (): Promise<void> => {
     try {
       setIsLoading(true);
       const [mobileConfig, desktopConfig]: [LayoutConfig[], LayoutConfig[]] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
-      const config = previewMode === "mobile" ? mobileConfig : desktopConfig;
+      const selectedConfig = previewMode === "mobile" ? mobileConfig : desktopConfig;
 
       if (moduleGroupSpecs) {
-        //filter out disabled specs
-        const moduleGroupSpecIds = moduleGroupSpecs.filter((spec) => !spec.disabled).map((spec) => Number(spec.id));
-        const allConfigIds = config.map((item) => item.spec_id);
+        const enabledSpecIds = moduleGroupSpecs.filter((spec) => !spec.disabled).map((spec) => Number(spec.id));
+        const matchingConfigs = selectedConfig.filter((config) => enabledSpecIds.includes(config.spec_id));
 
-        const matchingConfigIds = moduleGroupSpecIds.filter((id) => allConfigIds.includes(id));
-        const layoutConfig = config.filter((item) => matchingConfigIds.includes(item.spec_id));
-        // before i set the selected preview, i need to sort the matchedPreviewData based on the current_position
-        if (specsPositions && specsPositions.length > 0) {
-          //filter positons from all specs positions that match the module group spec ids
-          const filteredLayoutConfig = layoutConfig.filter((config) =>
-            specsPositions.some((position) => position.module_group_specs_id === config.spec_id)
-          );
-          const sortedLayoutConfig = filteredLayoutConfig
-            .map((config) => {
-              const position = specsPositions.find((position) => position.module_group_specs_id === config.spec_id);
-              return { ...config, current_position: position?.current_position ?? -1 };
-            })
-            .sort((a, b) => a.current_position - b.current_position);
-          console.log("sortedLayoutConfig", sortedLayoutConfig);
-          setLayoutConfig(sortedLayoutConfig);
-        } else {
-          setLayoutConfig(layoutConfig);
-        }
+        const sortedConfigs = specsPositions
+          ? matchingConfigs
+              .map((config) => {
+                const position = specsPositions.find((pos) => pos.module_group_specs_id === config.spec_id);
+                return { ...config, current_position: position?.current_position ?? -1 };
+              })
+              .sort((a, b) => a.current_position - b.current_position)
+          : matchingConfigs;
+        setLayoutConfig(sortedConfigs);
       }
     } catch (error) {
       console.error("Error fetching published IDs:", error);

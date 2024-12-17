@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Button, Dropdown, Modal, Skeleton, Typography } from "antd";
@@ -6,9 +6,10 @@ import styled from "styled-components";
 import LivePreview from "./LivePreview";
 import { getMobileConfigIDS } from "@/app/api/mobile-layout-configuration";
 import { getDesktopConfigIDS } from "@/app/api/desktop-layout-configuration";
-import { DesktopLayoutConfig, MobileLayoutConfig } from "@/app/data/typings";
+import { LayoutConfig } from "@/app/data/typings";
 import { usePathname } from "next/navigation";
 import { useModuleGroupSpecs } from "@/app/hooks/use-module-group-specs";
+import { useSpecsPositions } from "@/app/hooks/use-specs-positions";
 
 const SelectableLivePreview = () => {
   const [modalState, setModalState] = useState({
@@ -16,15 +17,18 @@ const SelectableLivePreview = () => {
     previewMode: null as "mobile" | "desktop" | null,
   });
 
-  const items: MenuProps["items"] = [
-    { key: "mobile", label: "Mobile Preview" },
-    { key: "desktop", label: "Desktop Preview" },
-  ];
+  const items: MenuProps["items"] = useMemo(
+    () => [
+      { key: "mobile", label: "Mobile Preview" },
+      { key: "desktop", label: "Desktop Preview" },
+    ],
+    []
+  );
 
-  const handleSelect: MenuProps["onSelect"] = (e) => {
+  const handleSelect = (key: string) => {
     setModalState({
       isModalOpen: true,
-      previewMode: e.key as "mobile" | "desktop",
+      previewMode: key as "mobile" | "desktop",
     });
   };
 
@@ -40,8 +44,7 @@ const SelectableLivePreview = () => {
       <Dropdown
         menu={{
           items,
-          selectable: true,
-          onSelect: handleSelect,
+          onClick: (e) => handleSelect(e.key),
           style: { maxHeight: 400, overflowY: "auto" },
         }}
       >
@@ -72,39 +75,42 @@ const ModalContent = ({
   const pathname = usePathname();
   const id = Number(pathname.split("/")[3]);
   const { moduleGroupSpecs } = useModuleGroupSpecs(id);
-  console.log(moduleGroupSpecs);
-
+  const { specsPositions } = useSpecsPositions(id);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedPreview, setSelectedPreview] = useState<MobileLayoutConfig[] | DesktopLayoutConfig[]>();
-  const [publishedIds, setPublishedIds] = useState<number[]>([]);
-  useEffect(() => {
-    const fetchPublishedLayout = async () => {
-      try {
-        const [mobileData, desktopData]: [MobileLayoutConfig[], DesktopLayoutConfig[]] = await Promise.all([
-          getMobileConfigIDS(),
-          getDesktopConfigIDS(),
-        ]);
-        setIsLoading(false);
-        const data = previewMode === "mobile" ? mobileData : desktopData;
+  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig[]>();
 
-        if (moduleGroupSpecs) {
-          const moduleGroupSpecIds = moduleGroupSpecs.filter((spec) => !spec.disabled).map((spec) => Number(spec.id));
-          const previewDataIds = data.map((item) => item.spec_id);
-          const matchingPreviewIds = moduleGroupSpecIds.filter((id) => previewDataIds.includes(id));
-          setPublishedIds(matchingPreviewIds);
-          const matchedPreviewData = data.filter((item) => matchingPreviewIds.includes(item.spec_id));
-          setSelectedPreview(matchedPreviewData);
-        }
-      } catch (error) {
-        console.error("Error fetching published IDs:", error);
-        setIsLoading(false);
-      }
-    };
-    if (previewMode) {
+  const fetchPublishedLayout = useCallback(async (): Promise<void> => {
+    try {
       setIsLoading(true);
+      const [mobileConfig, desktopConfig]: [LayoutConfig[], LayoutConfig[]] = await Promise.all([getMobileConfigIDS(), getDesktopConfigIDS()]);
+      const selectedConfig = previewMode === "mobile" ? mobileConfig : desktopConfig;
+
+      if (moduleGroupSpecs) {
+        const enabledSpecIds = moduleGroupSpecs.filter((spec) => !spec.disabled).map((spec) => Number(spec.id));
+        const matchingConfigs = selectedConfig.filter((config) => enabledSpecIds.includes(config.spec_id));
+
+        const sortedConfigs = specsPositions
+          ? matchingConfigs
+              .map((config) => {
+                const position = specsPositions.find((pos) => pos.module_group_specs_id === config.spec_id);
+                return { ...config, current_position: position?.current_position ?? -1 };
+              })
+              .sort((a, b) => a.current_position - b.current_position)
+          : matchingConfigs;
+        setLayoutConfig(sortedConfigs);
+      }
+    } catch (error) {
+      console.error("Error fetching published IDs:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [previewMode, moduleGroupSpecs]);
+
+  useEffect(() => {
+    if (previewMode) {
       fetchPublishedLayout();
     }
-  }, [previewMode]);
+  }, [previewMode, fetchPublishedLayout]);
 
   return (
     <ModalCss
@@ -122,7 +128,7 @@ const ModalContent = ({
       }}
     >
       <ContainerCss previewMode={previewMode}>
-        {isLoading ? <Skeleton active /> : selectedPreview && <LivePreview layoutConfig={selectedPreview} />}
+        {isLoading ? <Skeleton active /> : layoutConfig && <LivePreview layoutConfig={layoutConfig} />}
       </ContainerCss>
     </ModalCss>
   );

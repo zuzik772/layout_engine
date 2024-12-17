@@ -47,15 +47,12 @@ export type SpecPosition = {
   current_position: number;
 };
 
-export type MobileLayoutConfig = {
+export type LayoutConfig = {
   spec_id: number;
-  title?: string;
-  type?: string;
-  columns?: number;
-  rows?: number;
-  boxed?: boolean;
-};
-
-export interface DesktopLayoutConfig extends MobileLayoutConfig {
+  title: string;
+  type: string;
+  columns: number;
+  rows: number;
+  boxed: boolean;
   layout_option?: string;
-}
+};

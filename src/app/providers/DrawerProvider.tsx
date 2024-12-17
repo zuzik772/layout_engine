@@ -2,8 +2,6 @@ import { DrawerProps } from "antd";
 import React, { useState, createContext, useContext } from "react";
 import { DesktopLayoutConfig, MobileLayoutConfig } from "../data/typings";
 
-type Optional<T> = T | undefined;
-
 type DrawerStateDto = "edit" | "create";
 
 interface DrawerValuesDto {
@@ -13,8 +11,8 @@ interface DrawerValuesDto {
   selectedSpecId: number;
   selectedSpecName: string;
   size?: DrawerProps["size"];
-  mobileLayoutConfig: Optional<MobileLayoutConfig>;
-  desktopLayoutConfig: Optional<DesktopLayoutConfig>;
+  mobileLayoutConfig: MobileLayoutConfig;
+  desktopLayoutConfig: DesktopLayoutConfig;
 }
 
 interface DrawerContextDto extends DrawerValuesDto {
@@ -23,8 +21,8 @@ interface DrawerContextDto extends DrawerValuesDto {
   showMobileDrawer: (id: number, name: string) => void;
   showDesktopDrawer: (id: number, name: string) => void;
   closeDrawer: () => void;
-  setMobileLayoutConfig: (config: Optional<MobileLayoutConfig>) => void;
-  setDesktopLayoutConfig: (config: Optional<DesktopLayoutConfig>) => void;
+  setMobileLayoutConfig: (config: MobileLayoutConfig) => void;
+  setDesktopLayoutConfig: (config: DesktopLayoutConfig) => void;
 }
 
 const DrawerContext = createContext<DrawerContextDto>({} as DrawerContextDto);
@@ -41,8 +39,8 @@ function DrawerProvider(props: DrawerProviderProps) {
   const [size, setSize] = useState<DrawerProps["size"]>();
   const [selectedSpecId, setSelectedSpecId] = useState<number>(0);
   const [selectedSpecName, setSelectedSpecName] = useState<string>("");
-  const [mobileLayoutConfig, setMobileLayoutConfig] = useState<MobileLayoutConfig>();
-  const [desktopLayoutConfig, setDesktopLayoutConfig] = useState<DesktopLayoutConfig>();
+  const [mobileLayoutConfig, setMobileLayoutConfig] = useState<MobileLayoutConfig>({} as MobileLayoutConfig);
+  const [desktopLayoutConfig, setDesktopLayoutConfig] = useState<DesktopLayoutConfig>({} as DesktopLayoutConfig);
 
   const closeDrawer = () => {
     setDrawerOpen(false);

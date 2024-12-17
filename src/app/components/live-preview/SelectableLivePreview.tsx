@@ -104,7 +104,7 @@ const ModalContent = ({
     } finally {
       setIsLoading(false);
     }
-  }, [previewMode, moduleGroupSpecs]);
+  }, [previewMode, moduleGroupSpecs, specsPositions]);
 
   useEffect(() => {
     if (previewMode) {

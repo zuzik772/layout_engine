@@ -1,9 +1,21 @@
 import Link from "next/link";
 import styled from "styled-components";
-import { signOutAction } from "../actions";
 import { ButtonCss } from "./form/styling";
+import { Form } from "antd";
+import { useRouter } from "next/navigation";
+import { createClient } from "../../../utils/supabase/client";
 
 const SideNavigation = () => {
+  const supabase = createClient();
+  const router = useRouter();
+  const onFinish = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push("/sign-in");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
   return (
     <WrapperCss>
       <SideNavigationCss>
@@ -15,11 +27,11 @@ const SideNavigation = () => {
             <Link href={"/protected/preview"}>Preview</Link>
           </SideNavigationItemCss>
         </div>
-        <form action={signOutAction}>
+        <Form name="sign-out" initialValues={{ remember: true }} onFinish={onFinish}>
           <ButtonCss block type="primary" htmlType="submit">
             Sign out
           </ButtonCss>
-        </form>
+        </Form>
       </SideNavigationCss>
     </WrapperCss>
   );

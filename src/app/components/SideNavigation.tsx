@@ -1,7 +1,6 @@
 import Link from "next/link";
 import styled from "styled-components";
-import { ButtonCss } from "./form/styling";
-import { Form } from "antd";
+import { Button, Form } from "antd";
 import { useRouter } from "next/navigation";
 import { createClient } from "../../../utils/supabase/client";
 
@@ -28,10 +27,13 @@ const SideNavigation = () => {
           </SideNavigationItemCss>
         </div>
         <Form name="sign-out" initialValues={{ remember: true }} onFinish={onFinish}>
-          <ButtonCss block type="primary" htmlType="submit">
+          <Button block type="primary" htmlType="submit">
             Sign out
-          </ButtonCss>
+          </Button>
         </Form>
+        <button type="submit" onClick={onFinish}>
+          Sign out
+        </button>
       </SideNavigationCss>
     </WrapperCss>
   );

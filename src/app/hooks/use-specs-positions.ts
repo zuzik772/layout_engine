@@ -3,15 +3,18 @@ import { queryKeys } from "../data/query-keys";
 
 import { SpecPosition } from "../data/typings";
 import { getSpecsPositions, updateSpecsPositions } from "../api/specs-positions/[id]";
+import { useAuth } from "../(auth-pages)/use-auth";
 
 export function useSpecsPositions(id: number) {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
   const { isLoading, error, data } = useQuery<SpecPosition[]>({
     queryKey: [queryKeys.specsPositions, id],
     queryFn: () => getSpecsPositions(id),
     initialData: () => {
       return queryClient.getQueryData<SpecPosition[]>([queryKeys.specsPositions, id]);
     },
+    enabled: !!accessToken,
   });
 
   // update specs positions

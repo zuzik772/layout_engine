@@ -5,9 +5,6 @@ const ModuleGroupsHeader = () => {
   return (
     <FlexContainer>
       <h2>Module groups</h2>
-
-      <button>Import data</button>
-      <button>Delete data</button>
     </FlexContainer>
   );
 };

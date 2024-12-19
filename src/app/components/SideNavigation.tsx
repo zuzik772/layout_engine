@@ -20,10 +20,7 @@ const SideNavigation = () => {
       <SideNavigationCss>
         <div>
           <SideNavigationItemCss>
-            <Link href={"/protected"}>Module CMS</Link>
-          </SideNavigationItemCss>
-          <SideNavigationItemCss>
-            <Link href={"/protected/preview"}>Preview</Link>
+            <LinkCss href={"/protected"}>Layout Engine</LinkCss>
           </SideNavigationItemCss>
         </div>
         <Form name="sign-out" initialValues={{ remember: true }} onFinish={onFinish}>
@@ -31,9 +28,6 @@ const SideNavigation = () => {
             Sign out
           </Button>
         </Form>
-        <button type="submit" onClick={onFinish}>
-          Sign out
-        </button>
       </SideNavigationCss>
     </WrapperCss>
   );
@@ -83,4 +77,9 @@ const SideNavigationItemCss = styled.li`
   line-height: 16px;
   color: ${(p) => p.theme.colors.white};
   padding-top: ${(p) => p.theme.sizes.spacingXs};
+  text-align: center;
+`;
+
+const LinkCss = styled(Link)`
+  color: ${(p) => p.theme.colors.white};
 `;

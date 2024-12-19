@@ -2,9 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DesktopLayoutConfig } from "../data/typings";
 import { addDesktopConfig, getDesktopConfig, updateDesktopConfig } from "../api/desktop-layout-configuration/[id]";
 import { queryKeys } from "../data/query-keys";
+import { useAuth } from "../(auth-pages)/use-auth";
 
 export function useDesktopLayoutConfig(id: number) {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
   const queryKey = [queryKeys.desktopLayoutConfig, id];
   const {
     isLoading,
@@ -17,6 +19,7 @@ export function useDesktopLayoutConfig(id: number) {
       const cachedData = queryClient.getQueryData<DesktopLayoutConfig>(queryKey);
       return cachedData;
     },
+    enabled: !!accessToken,
   });
 
   // Add a new desktop layout config mutation and invalidate query

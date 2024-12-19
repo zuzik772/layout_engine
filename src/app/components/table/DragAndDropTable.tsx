@@ -306,7 +306,6 @@ const DraggableTable: React.FC = () => {
               }}
               rowKey="key"
               pagination={false}
-              sticky
               rowClassName={(record) => (record.disabled ? "disabled-row" : "")}
             />
           )}
@@ -338,6 +337,7 @@ const StyledTable = styled.div`
   .ant-table-tbody > tr {
     cursor: grab;
   }
+
   .ant-table-thead > tr > th:first-child {
     width: 35px;
     height: 43px;
@@ -407,6 +407,8 @@ const FlexEndContainer = styled.div`
   flex-grow: 1;
   align-items: center;
   justify-content: end;
+  min-width: 600px;
+  overflow-x: hidden;
 `;
 
 const TextCss = styled.span`

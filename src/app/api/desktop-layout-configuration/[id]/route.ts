@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "../../../../../utils/supabase/client";
-
-const supabase = createClient();
+import { getSupabaseClientWithSession } from "@/app/(auth-pages)/utils";
 
 export async function GET(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
   if (!id) {
     return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
@@ -14,6 +17,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: number }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
   if (!id) {
     return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
@@ -26,6 +34,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: number 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
   if (!id) {
     return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });

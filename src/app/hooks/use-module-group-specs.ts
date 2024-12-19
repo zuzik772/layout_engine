@@ -2,9 +2,11 @@ import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "../data/query-keys";
 import { getModuleGroupSpecs, addModuleGroupSpec, deleteModuleGroupSpec, updateModuleGroupSpec } from "../api/module-group-specs/[id]";
 import { ModuleSpec } from "../data/typings";
+import { useAuth } from "../(auth-pages)/use-auth";
 
 export function useModuleGroupSpecs(id: number) {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
   const queryKey = [queryKeys.moduleGroupSpecs, id];
   const {
     isLoading,
@@ -17,6 +19,7 @@ export function useModuleGroupSpecs(id: number) {
       const cachedData = queryClient.getQueryData<ModuleSpec[]>(queryKey);
       return cachedData;
     },
+    enabled: !!accessToken,
   });
 
   // Add a new module spec mutation and invalidate query

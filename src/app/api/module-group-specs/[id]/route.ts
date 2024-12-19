@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "../../../../../utils/supabase/client";
-
-const supabase = createClient();
+import { getSupabaseClientWithSession } from "@/app/(auth-pages)/utils";
 
 export async function GET(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
   if (!id) {
     return NextResponse.json({ error: "Missing id parameter" }, { status: 400 });
@@ -21,6 +24,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: number }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
   const { module_spec_id } = await req.json();
 
@@ -38,6 +46,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: number 
 
 //delete route
 export async function DELETE(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
 
   console.log("DELETE module group spec", id);
@@ -55,6 +68,11 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: numbe
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
+  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
+  if (sessionError) {
+    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
+  }
+
   const { id } = params;
 
   if (!id) {

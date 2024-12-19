@@ -24,7 +24,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     const checkUser = async () => {
-      //   const user = await supabase.auth.getUser();
       const { data: session } = await supabase.auth.getSession();
 
       const token = session.session?.access_token;

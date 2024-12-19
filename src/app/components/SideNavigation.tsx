@@ -31,9 +31,6 @@ const SideNavigation = () => {
             Sign out
           </Button>
         </Form>
-        <button type="submit" onClick={onFinish}>
-          Sign out
-        </button>
       </SideNavigationCss>
     </WrapperCss>
   );

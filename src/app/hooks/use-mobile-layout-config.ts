@@ -2,11 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MobileLayoutConfig } from "../data/typings";
 import { addMobileConfig, getMobileConfig, updateMobileConfig } from "../api/mobile-layout-configuration/[id]";
 import { queryKeys } from "../data/query-keys";
-import { useAuth } from "../(auth-pages)/use-auth";
 
 export function useMobileLayoutConfig(id: number) {
   const queryClient = useQueryClient();
-  const { accessToken } = useAuth();
+
   const queryKey = [queryKeys.mobileLayoutConfig, id];
   const {
     isLoading,
@@ -19,7 +18,6 @@ export function useMobileLayoutConfig(id: number) {
       const cachedData = queryClient.getQueryData<MobileLayoutConfig>(queryKey);
       return cachedData;
     },
-    enabled: !!accessToken,
   });
 
   // Add a new mobile layout config mutation and invalidate query

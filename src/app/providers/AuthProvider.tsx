@@ -1,46 +1,30 @@
-"use client";
-
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
-
-import { createClient } from "../../../utils/supabase/client";
+import React, { createContext, PropsWithChildren, useContext, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "../(auth-pages)/use-auth";
 import { FlexCenterContainer } from "../components/layout/styling";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { usePathname, useRouter } from "next/navigation";
-import { AuthChangeEvent, Session } from "@supabase/auth-js";
 
-type AuthProps = {
+interface AuthProps {
   user: boolean;
-};
+}
 
 const GlobalContext = createContext<AuthProps>({} as AuthProps);
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
-  const supabase = createClient();
-  const [user, setUser] = useState<boolean>(false);
-  const [session, setSession] = useState<AuthChangeEvent | Session | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { user, loading } = useAuth();
   const router = useRouter();
   const pathName = usePathname();
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: session } = await supabase.auth.getSession();
-
-      const token = session.session?.access_token;
-      if (pathName.startsWith("/protected") && !token) {
-        setLoading(false);
-        setSession(null);
-        setUser(false);
+    if (!loading) {
+      if (pathName.startsWith("/protected") && !user) {
         console.log("redirecting to sign-in");
-        return router.push("/sign-in");
-      } else if (token) {
-        setUser(!!token);
-        setLoading(false);
+        router.push("/sign-in");
+      } else if (pathName === "/" && user) {
+        router.push("/");
       }
-      setLoading(false);
-    };
-    checkUser();
-  }, [router, pathName, supabase.auth, user]);
+    }
+  }, [loading, user, pathName, router]);
 
   if (loading) {
     return (
@@ -50,17 +34,11 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     );
   }
 
-  return (
-    <GlobalContext.Provider
-      value={{
-        user,
-      }}
-    >
-      {children}
-    </GlobalContext.Provider>
-  );
+  return <GlobalContext.Provider value={{ user }}>{children}</GlobalContext.Provider>;
 };
 
-export const useAuthProvider = () => useContext(GlobalContext);
+export const useAuthContext = () => {
+  return useContext(GlobalContext);
+};
 
 export default AuthProvider;

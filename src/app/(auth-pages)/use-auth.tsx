@@ -1,7 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "../../../utils/supabase/client";
-import { setAuthHeaders } from "./axiosClient";
-import { getAuthCookies, setAuthCookies } from "./cookies";
 
 export function useAuth() {
   const supabase = useMemo(() => createClient(), []);
@@ -16,13 +14,10 @@ export function useAuth() {
         if (sessionError) {
           throw new Error(sessionError.message);
         }
-        //get the tokens from session, otherwise fallback to cookies
-        const userAccessToken = sessionData?.session?.access_token ?? getAuthCookies()?.accessToken ?? null;
-        const userRefreshToken = sessionData?.session?.refresh_token ?? getAuthCookies()?.refreshToken ?? null;
+        const userAccessToken = sessionData?.session?.access_token ?? null;
+        const userRefreshToken = sessionData?.session?.refresh_token ?? null;
 
         if (userAccessToken && userRefreshToken) {
-          setAuthHeaders(userAccessToken as string, userRefreshToken as string);
-          setAuthCookies(userAccessToken as string, userRefreshToken as string); // store tokens in secure cookies
           setUser(true);
         } else {
           setUser(false);

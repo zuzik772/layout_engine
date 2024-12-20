@@ -1,8 +1,10 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect } from "react";
+"use client";
+import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "../(auth-pages)/use-auth";
 import { FlexCenterContainer } from "../components/layout/styling";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { createClient } from "../../../utils/supabase/client";
 
 interface AuthProps {
   user: boolean;
@@ -11,20 +13,32 @@ interface AuthProps {
 const GlobalContext = createContext<AuthProps>({} as AuthProps);
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
-  const { user, loading } = useAuth();
+  const supabase = createClient();
+  const [user, setUser] = useState<boolean>(false);
+  const [session, setSession] = useState<AuthChangeEvent | Session | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   const pathName = usePathname();
-
+  console.log("user", user);
   useEffect(() => {
-    if (!loading) {
-      if (pathName.startsWith("/protected") && !user) {
+    const checkUser = async () => {
+      const { data: session } = await supabase.auth.getSession();
+
+      const token = session.session?.access_token;
+      if (pathName.startsWith("/protected") && !token) {
+        setLoading(false);
+        setSession(null);
+        setUser(false);
         console.log("redirecting to sign-in");
-        router.push("/sign-in");
-      } else if (pathName === "/" && user) {
-        router.push("/");
+        return router.push("/sign-in");
+      } else if (token) {
+        setUser(!!token);
+        setLoading(false);
       }
-    }
-  }, [loading, user, pathName, router]);
+      setLoading(false);
+    };
+    checkUser();
+  }, [router, pathName, supabase.auth, user]);
 
   if (loading) {
     return (

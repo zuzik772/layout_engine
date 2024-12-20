@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
 import { encodedRedirect } from "../../utils/utils";
-import { revalidatePath } from "next/cache";
 
 export const signUpAction = async (formData: FormData) => {
   const supabase = createClient();
@@ -43,7 +42,6 @@ export const signInAction = async (formData: FormData) => {
   if (error) {
     return encodedRedirect("error", "/sign-in", error.message);
   }
-  revalidatePath("/protected", "layout");
   return redirect("/protected");
 };
 

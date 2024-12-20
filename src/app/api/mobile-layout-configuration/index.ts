@@ -1,8 +1,8 @@
-import { axiosClient } from "@/app/(auth-pages)/axiosClient";
+import axios from "axios";
 
 export async function getMobileConfigIDS(): Promise<any> {
   try {
-    const res = await axiosClient.get(`/api/mobile-layout-configuration/`);
+    const res = await axios.get(`/api/mobile-layout-configuration/`);
     return res.data;
   } catch (error) {
     console.error("Error fetching mobile config:", error);

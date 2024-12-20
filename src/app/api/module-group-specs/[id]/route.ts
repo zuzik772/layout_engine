@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClientWithSession } from "@/app/(auth-pages)/utils";
+import { createClient } from "../../../../../utils/supabase/server";
 
 export async function GET(req: NextRequest, { params }: { params: { id: number } }) {
-  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
-  if (sessionError) {
-    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
-  }
+  const supabase = createClient();
 
   const { id } = params;
   if (!id) {
@@ -24,10 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: number }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: number } }) {
-  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
-  if (sessionError) {
-    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
-  }
+  const supabase = createClient();
 
   const { id } = params;
   const { module_spec_id } = await req.json();
@@ -46,10 +40,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: number 
 
 //delete route
 export async function DELETE(req: NextRequest, { params }: { params: { id: number } }) {
-  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
-  if (sessionError) {
-    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
-  }
+  const supabase = createClient();
 
   const { id } = params;
 
@@ -68,10 +59,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: numbe
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
-  const { supabase, error: sessionError } = await getSupabaseClientWithSession(req);
-  if (sessionError) {
-    return NextResponse.json({ error: "Error setting session" }, { status: 500 });
-  }
+  const supabase = createClient();
 
   const { id } = params;
 

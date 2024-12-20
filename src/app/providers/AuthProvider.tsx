@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, PropsWithChildren, useContext, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../(auth-pages)/use-auth";
@@ -14,7 +15,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathName = usePathname();
-
   useEffect(() => {
     if (!loading) {
       if (pathName.startsWith("/protected") && !user) {

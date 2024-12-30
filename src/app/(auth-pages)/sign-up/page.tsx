@@ -7,10 +7,10 @@ import { Form, Input } from "antd";
 import { signUpAction } from "@/app/actions";
 import { FormMessage } from "@/app/components/FormMessage";
 import { FlexColCss, HeadingCss, DescriptionCss, ButtonCss } from "@/app/components/form/styling";
-import { getMessage } from "../utils";
+import { useMessage } from "@/app/hooks/use-message";
 
 function SignUpPage() {
-  const message = getMessage();
+  const message = useMessage();
 
   const onFinish = async (values: any) => {
     const formData = new FormData();

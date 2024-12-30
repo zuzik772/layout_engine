@@ -1,7 +1,7 @@
 import { useSearchParams } from "next/navigation";
 import { Message } from "../components/FormMessage";
 
-export function getMessage(): Message {
+export function useMessage(): Message {
   const searchParams = useSearchParams();
   const error = searchParams.get("error") ?? "";
   const success = searchParams.get("success") ?? "";

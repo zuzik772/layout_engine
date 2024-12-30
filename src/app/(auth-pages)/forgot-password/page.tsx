@@ -7,10 +7,10 @@ import { Form, Input } from "antd";
 import { forgotPasswordAction } from "@/app/actions";
 import { ButtonCss, DescriptionCss, FlexColCss, HeadingCss } from "@/app/components/form/styling";
 import { FormMessage } from "@/app/components/FormMessage";
-import { getMessage } from "../utils";
+import { useMessage } from "@/app/hooks/use-message";
 
 function ForgotPasswordPage() {
-  const message = getMessage();
+  const message = useMessage();
 
   const onFinish = async (values: any) => {
     const formData = new FormData();

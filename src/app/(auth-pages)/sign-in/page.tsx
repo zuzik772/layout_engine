@@ -6,7 +6,7 @@ import { Form, Input } from "antd";
 import { signInAction } from "@/app/actions";
 import { FormMessage } from "@/app/components/FormMessage";
 import { ButtonCss, DescriptionCss, FlexColCss, HeadingCss } from "@/app/components/form/styling";
-import { getMessage } from "../utils";
+import { useMessage } from "@/app/hooks/use-message";
 
 type SignInForm = {
   email: string;
@@ -14,7 +14,7 @@ type SignInForm = {
 };
 
 function SignInPage() {
-  const message = getMessage();
+  const message = useMessage();
 
   const onFinish = async (values: SignInForm) => {
     const formData = new FormData();

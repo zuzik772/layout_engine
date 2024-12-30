@@ -1,17 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 
-export type Message =
-  | { success: string }
-  | { error: string }
-  | { message: string };
+export type Message = { success: string } | { error: string } | { message: string };
 
 export function FormMessage({ message }: { message: Message }) {
   return (
     <MessageContainer>
-      {"success" in message && (
-        <SuccessMessage>{message.success}</SuccessMessage>
-      )}
+      {"success" in message && <SuccessMessage>{message.success}</SuccessMessage>}
       {"error" in message && <ErrorMessage>{message.error}</ErrorMessage>}
       {"message" in message && <InfoMessage>{message.message}</InfoMessage>}
     </MessageContainer>

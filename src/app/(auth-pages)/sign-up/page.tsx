@@ -5,10 +5,13 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Form, Input } from "antd";
 
 import { signUpAction } from "@/app/actions";
-import { FormMessage, Message } from "@/app/components/FormMessage";
+import { FormMessage } from "@/app/components/FormMessage";
 import { FlexColCss, HeadingCss, DescriptionCss, ButtonCss } from "@/app/components/form/styling";
+import { getMessage } from "../utils";
 
-function SignUpPage({ searchParams }: { searchParams: Message }) {
+function SignUpPage() {
+  const message = getMessage();
+
   const onFinish = async (values: any) => {
     const formData = new FormData();
     formData.append("email", values.email);
@@ -19,7 +22,7 @@ function SignUpPage({ searchParams }: { searchParams: Message }) {
     <FlexColCss>
       <HeadingCss>Sign up</HeadingCss>
       <DescriptionCss>Please create an account</DescriptionCss>
-      <FormMessage message={searchParams} />
+      <FormMessage message={message} />
       <Form name="signup" initialValues={{ remember: true }} style={{ maxWidth: 360 }} onFinish={onFinish}>
         <Form.Item name="email" rules={[{ required: true, message: "Please input your email!" }]}>
           <Input prefix={<UserOutlined />} placeholder="Email" />

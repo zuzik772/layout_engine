@@ -4,7 +4,6 @@ import styled from "styled-components";
 export type Message = { success: string } | { error: string } | { message: string };
 
 export function FormMessage({ message }: { message: Message }) {
-  console.log("message", message);
   return (
     <MessageContainer>
       {"success" in message && <SuccessMessage>{message.success}</SuccessMessage>}

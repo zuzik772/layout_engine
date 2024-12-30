@@ -6,15 +6,11 @@ import { Form, Input } from "antd";
 
 import { forgotPasswordAction } from "@/app/actions";
 import { ButtonCss, DescriptionCss, FlexColCss, HeadingCss } from "@/app/components/form/styling";
-import { FormMessage, Message } from "@/app/components/FormMessage";
-import { usePathname, useSearchParams } from "next/navigation";
+import { FormMessage } from "@/app/components/FormMessage";
+import { getMessage } from "../utils";
 
 function ForgotPasswordPage() {
-  const searchParams = useSearchParams();
-  console.log("searchParams", searchParams);
-  const error = searchParams.get("error");
-  const success = searchParams.get("success");
-  const message = searchParams.get("message");
+  const message = getMessage();
 
   const onFinish = async (values: any) => {
     const formData = new FormData();
@@ -25,13 +21,7 @@ function ForgotPasswordPage() {
     <FlexColCss>
       <HeadingCss>Reset password</HeadingCss>
       <DescriptionCss>Enter your email to reset the password</DescriptionCss>
-      <FormMessage
-        message={{
-          ...(error && { error }),
-          ...(success && { success }),
-          message: message || "",
-        }}
-      />
+      <FormMessage message={message} />
       <Form name="forgot-password" onFinish={onFinish}>
         <Form.Item name="email" rules={[{ required: true, message: "Please input your email!" }]}>
           <Input prefix={<UserOutlined />} placeholder="Email" />

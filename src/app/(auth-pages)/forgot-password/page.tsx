@@ -5,15 +5,17 @@ import { UserOutlined } from "@ant-design/icons";
 import { Form, Input } from "antd";
 
 import { forgotPasswordAction } from "@/app/actions";
-import {
-  ButtonCss,
-  DescriptionCss,
-  FlexColCss,
-  HeadingCss,
-} from "@/app/components/form/styling";
+import { ButtonCss, DescriptionCss, FlexColCss, HeadingCss } from "@/app/components/form/styling";
 import { FormMessage, Message } from "@/app/components/FormMessage";
+import { usePathname, useSearchParams } from "next/navigation";
 
-function ForgotPasswordPage({ searchParams }: { searchParams: Message }) {
+function ForgotPasswordPage() {
+  const searchParams = useSearchParams();
+  console.log("searchParams", searchParams);
+  const error = searchParams.get("error");
+  const success = searchParams.get("success");
+  const message = searchParams.get("message");
+
   const onFinish = async (values: any) => {
     const formData = new FormData();
     formData.append("email", values.email);
@@ -23,12 +25,15 @@ function ForgotPasswordPage({ searchParams }: { searchParams: Message }) {
     <FlexColCss>
       <HeadingCss>Reset password</HeadingCss>
       <DescriptionCss>Enter your email to reset the password</DescriptionCss>
-      <FormMessage message={searchParams} />
+      <FormMessage
+        message={{
+          ...(error && { error }),
+          ...(success && { success }),
+          message: message || "",
+        }}
+      />
       <Form name="forgot-password" onFinish={onFinish}>
-        <Form.Item
-          name="email"
-          rules={[{ required: true, message: "Please input your email!" }]}
-        >
+        <Form.Item name="email" rules={[{ required: true, message: "Please input your email!" }]}>
           <Input prefix={<UserOutlined />} placeholder="Email" />
         </Form.Item>
         <Form.Item>
